@@ -2,7 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from "@nestjs/config";
-import { JwtPayload } from "./jwt.payload";
+import { CustomRequest } from "../../types/custom-request";
+import { JwtPayload } from "../types/jwt.payload";
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly configService: ConfigService) {
@@ -20,6 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             userId: payload.sub,
             email: payload.email,
             roles: payload.roles,
-        };
+        } as CustomRequest;
     }
 }
