@@ -1,1 +1,4 @@
-export type LoginType = 'google' | 'local';
+export enum LoginType {
+    GOOGLE = 'google',
+    LOCAL = 'local',
+}

@@ -13,17 +13,20 @@ import {
   
   import { LocalStrategy } from './strategies/local.strategy';
   import { GoogleStrategy } from './strategies/google.strategy';
+  import { JwtStrategy } from './strategies/jwt.strategy';
   
   import { JwtAuthGuard } from './guards/jwt-auth.guard';
   import { LocalAuthGuard } from './guards/local-auth.guard';
   import { GoogleAuthGuard } from './guards/google-auth.guard';
+  import { RolesGuard } from './guards/roles.guard';
   
-  import { JwtService } from './service/jwt.service';
-  import { AuthService } from './service/auth.service';
-  import { GoogleAuthService } from './service/google-auth.service';
+  import { JwtService } from '@nestjs/jwt';
+  import { DefaultAuthService } from './service/default-auth.service';
+  import { IAuthService } from './interfaces/auth-service.interface';
 
-  import { AUTH_SERVICE, GOOGLE_AUTH_SERVICE, DEFAULT_JWT_EXPIRES_IN } from './constants/auth.constants';
+  import { AUTH_SERVICE, DEFAULT_JWT_EXPIRES_IN } from './constants/auth.constants';
   import { IUserService } from '../user/user-service.interface';
+import { jwtConfig } from './config/jwt.config';
 
   export interface AuthModuleOptions {
     strategies: {
@@ -32,6 +35,7 @@ import {
       google?: boolean;
     };
     userService: ClassProvider<IUserService<any>> | FactoryProvider<IUserService<any>>;
+    authService?: ClassProvider<IAuthService> | FactoryProvider<IAuthService>;
   }
   
   @Module({})
@@ -50,8 +54,8 @@ import {
   
       // 🧩 Register strategies based on config
       if (options.strategies.jwt) {
-        // JwtModule async config
-        exports.push(JwtAuthGuard, JwtService);
+        providers.push(JwtStrategy);
+        exports.push(JwtAuthGuard);
       }
   
       if (options.strategies.local) {
@@ -60,24 +64,26 @@ import {
       }
   
       if (options.strategies.google) {
-        providers.push(GoogleStrategy, GoogleAuthGuard, {
-          provide: GOOGLE_AUTH_SERVICE,
-          useFactory: (config: ConfigService, jwtService: JwtService) => {
-            return new GoogleAuthService(config, jwtService);
-          },
-          inject: [ConfigService, options.userService.provide],
-        });
-        exports.push(GoogleAuthGuard, GOOGLE_AUTH_SERVICE);
+        providers.push(GoogleStrategy, GoogleAuthGuard);
+        exports.push(GoogleAuthGuard);
       }
+
+      // Add RolesGuard
+      providers.push(RolesGuard);
+      exports.push(RolesGuard);
   
-      // 🧠 Main AuthService
-      providers.push({
-        provide: AUTH_SERVICE,
-        useFactory: (userService: IUserService, jwtService: JwtService) => {
-          return new AuthService(userService, jwtService);
-        },
-        inject: [options.userService.provide, JwtService],
-      });
+      // 🧠 Main AuthService - Use custom implementation if provided, otherwise use default
+      if (options.authService) {
+        providers.push(options.authService);
+      } else {
+        providers.push({
+          provide: AUTH_SERVICE,
+          useFactory: (jwtService: JwtService, userService: IUserService, configService: ConfigService) => {
+            return new DefaultAuthService(jwtService, userService, configService);
+          },
+          inject: [JwtService, options.userService.provide, ConfigService],
+        });
+      }
       exports.push(AUTH_SERVICE);
   
       // Final dynamic module return
@@ -89,13 +95,7 @@ import {
           ...(options.strategies.jwt
             ? [
                 JwtModule.registerAsync({
-                  useFactory: (configService: ConfigService) => ({
-                    secret: configService.get('JWT_SECRET'),
-                    signOptions: {
-                      expiresIn: configService.get('JWT_EXPIRES_IN') || DEFAULT_JWT_EXPIRES_IN,
-                      audience: configService.get('JWT_AUDIENCE'),
-                    },
-                  }),
+                  useFactory: (configService: ConfigService) => jwtConfig(configService),
                   inject: [ConfigService],
                 }),
               ]

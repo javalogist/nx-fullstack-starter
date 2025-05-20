@@ -1,21 +1,17 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from '../service/auth.service';
+import { DefaultAuthService } from '../service/default-auth.service';
 import { IBaseUser } from '@kodevy-core-2.0/shared';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(private authService: DefaultAuthService) {
     // 👇 customize field names if needed (default is 'username')
     super({ usernameField: 'email',passwordField: 'password' });
   }
 
   async validate(email: string, password: string): Promise<IBaseUser> {
-    const user = await this.authService.validateUser(email, password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid login');
-    }
-    return user;
+    return await this.authService.validateUser(email, password);
   }
 }
