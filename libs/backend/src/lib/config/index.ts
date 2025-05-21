@@ -4,3 +4,6 @@ export * from './logger.config';
 export * from './helmet.config';
 export * from './throttle.config';
 export * from './compression.config';
+export * from './api-version.config';
+export * from './pipes.config';
+export * from './swagger.config';

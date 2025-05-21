@@ -55,6 +55,7 @@ export class WinstonLoggerService implements LoggerService {
     this.logger = createLogger({
       level: isProduction ? 'info' : 'debug',
       format: format.combine(
+        format.colorize({ all: true }),
         format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss a' }),
         format.errors({ stack: true }),
         format.splat(),

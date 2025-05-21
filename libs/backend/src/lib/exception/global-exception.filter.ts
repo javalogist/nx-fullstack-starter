@@ -12,7 +12,8 @@ import {
   
   @Catch()
   export class GlobalExceptionFilter implements ExceptionFilter {
-    constructor(private readonly logger: Logger) {}
+    private readonly logger = Logger;
+
   
     catch(exception: any, host: ArgumentsHost) {
       const ctx = host.switchToHttp();

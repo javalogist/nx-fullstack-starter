@@ -1,10 +1,11 @@
 // libs/backend/health/src/lib/health.controller.ts
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import { HealthCheck } from '@nestjs/terminus';
 import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
+
   constructor(private readonly healthService: HealthService) {}
 
   @Get()

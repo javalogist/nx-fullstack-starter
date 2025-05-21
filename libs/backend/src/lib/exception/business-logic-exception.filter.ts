@@ -6,7 +6,7 @@ import { ApiErrorResponse, ApiResponse } from '@kodevy-core-2.0/shared';
 
 @Catch(BusinessLogicException)
 export class BusinessLogicExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: Logger) {}
+  private readonly logger = Logger;
 
   catch(exception: BusinessLogicException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

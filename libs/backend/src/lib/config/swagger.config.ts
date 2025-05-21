@@ -10,33 +10,24 @@ import { ConfigService } from '@nestjs/config';
  * Environment Variables:
  * - APP_NAME: Name of your application (default: 'my-app')
  * - API_VERSION: API version (default: '1')
- * - API_DESCRIPTION: API description (default: 'Swagger API Documentation for {APP_NAME}')
- * - API_TAGS: Comma-separated list of API tags (default: none)
  * - SWAGGER_PATH: Path for Swagger UI (default: 'api-docs')
- * - SWAGGER_JSON_PATH: Path for Swagger JSON (default: 'api/v1/swagger-json')
+ * - SWAGGER_JSON_PATH: Path for Swagger JSON (default: 'swagger-json')
  * 
  * Example .env:
- * APP_NAME=My Awesome API
- * API_VERSION=1.0.0
- * API_DESCRIPTION=API documentation for My Awesome API
- * API_TAGS=auth,users,products
+ * API_VERSION=1
  * SWAGGER_PATH=docs
- * SWAGGER_JSON_PATH=api/v1/docs.json
+ * SWAGGER_JSON_PATH=swagger-json
  */
 export const setupSwagger = (
   app: INestApplication,
-  configService: ConfigService
+  configService: ConfigService,
+  globalPrefix: string
 ) => {
   const appName = configService.get<string>('APP_NAME', 'my-app');
-  const version = configService.get<string>('API_VERSION', '1');
-  const description = configService.get<string>(
-    'API_DESCRIPTION',
-    `Swagger API Documentation for ${appName}`
-  );
-  const tags = configService
-    .get<string>('API_TAGS')
-    ?.split(',')
-    .map(tag => tag.trim()) ?? [];
+  const version = configService.get<string>('API_DEFAULT_VERSION', '1');
+  const versionPrefix = configService.get<string>('API_VERSION_PREFIX', 'v');
+  const description = `Swagger API Documentation for ${appName}`;
+  const tags = <string[]>[];
 
   const config = new DocumentBuilder()
     .setTitle(appName)
@@ -88,9 +79,10 @@ export const setupSwagger = (
   });
 
   // Expose the JSON spec
-  const jsonPath = configService.get<string>('SWAGGER_JSON_PATH', 'api/v1/swagger-json');
+  
+  const jsonPath = configService.get<string>('SWAGGER_JSON_PATH', 'swagger-json');
   const httpAdapter = app.getHttpAdapter();
-  httpAdapter.get(jsonPath, (req, res) => {
+  httpAdapter.get(`${globalPrefix}/${versionPrefix}/${version}/${jsonPath}`, (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(document);
   });

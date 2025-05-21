@@ -9,8 +9,7 @@ import {
   
   @Injectable()
   export class RequestLoggerInterceptor implements NestInterceptor {
-    constructor(private readonly logger: Logger) {}
-  
+    private readonly logger = Logger;
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
       const now = Date.now();
       const request = context.switchToHttp().getRequest();

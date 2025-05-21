@@ -9,23 +9,17 @@ import { VersioningOptions, VersioningType } from '@nestjs/common';
  * Environment Variables:
  * - API_VERSION_STRATEGY: Versioning strategy to use (default: 'uri')
  * - API_VERSION_PREFIX: Prefix for version numbers (default: 'v')
- * - API_VERSION_DEFAULT: Default version to use (default: '1')
- * - API_VERSION_DEPRECATED: Comma-separated list of deprecated versions
- * - API_VERSION_SUNSET: JSON string of version sunset dates
+ * - API_DEFAULT_VERSION: Default version to use (default: '1')
  * 
  * Example .env:
  * API_VERSION_STRATEGY=uri
  * API_VERSION_PREFIX=v
- * API_VERSION_DEFAULT=1
- * API_VERSION_DEPRECATED=v1,v2
- * API_VERSION_SUNSET={"v1":"2024-12-31","v2":"2025-06-30"}
+ * API_DEFAULT_VERSION=1
  */
 export const apiVersionConfig = (configService: ConfigService): VersioningOptions => {
   const strategy = configService.get('API_VERSION_STRATEGY', VersioningType.URI);
   const prefix = configService.get('API_VERSION_PREFIX', 'v');
-  const defaultVersion = configService.get('API_VERSION_DEFAULT', '1');
-  const deprecatedVersions = configService.get('API_VERSION_DEPRECATED', '').split(',').filter(Boolean);
-  const sunsetVersions = configService.get('API_VERSION_SUNSET', '{}');
+  const defaultVersion = configService.get('API_DEFAULT_VERSION', '1');
 
   const config: VersioningOptions = {
     type: VersioningType.URI,
@@ -46,8 +40,6 @@ export const apiVersionConfig = (configService: ConfigService): VersioningOption
     console.log('- Strategy:', strategy);
     console.log('- Prefix:', prefix);
     console.log('- Default Version:', defaultVersion);
-    console.log('- Deprecated Versions:', deprecatedVersions);
-    console.log('- Sunset Versions:', JSON.parse(sunsetVersions));
   }
 
   return config;
