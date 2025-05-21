@@ -6,6 +6,10 @@ export const GOOGLE_STRATEGY = 'google';
 
 export const DEFAULT_JWT_EXPIRES_IN = '1d';
 
+export const IS_PUBLIC_KEY = 'isPublic';
+export const ROLES_KEY = 'roles';
+
+
 export const GOOGLE_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile',

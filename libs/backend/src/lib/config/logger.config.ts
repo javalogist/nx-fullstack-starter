@@ -4,7 +4,6 @@ import { createLogger, format, Logger, transports } from 'winston';
 import * as winstonMongoDB from 'winston-mongodb';
 import * as winston from 'winston';
 
-// 🎨 Define custom log colors (optional)
 winston.addColors({
   info: 'green',
   warn: 'yellow',
@@ -14,55 +13,58 @@ winston.addColors({
 });
 
 @Injectable()
-export class WinstonConfig implements LoggerService {
+export class WinstonLoggerService implements LoggerService {
   private readonly logger: Logger;
 
   constructor(private configService: ConfigService) {
     const isProduction =
-      this.configService.get<string>('NODE_ENV', 'development') ===
-      'production';
+      this.configService.get<string>('NODE_ENV', 'development') === 'production';
     const mongoUri = this.configService.get<string>('MONGO_URI', '');
     const appName = this.configService.get<string>('APP_NAME', 'MyApp');
 
-    const mongoTransports = isProduction
-      ? [
-          new winstonMongoDB.MongoDB({
-            level: 'info',
-            db: mongoUri,
-            collection: 'app_logs',
-            capped: true,
-            cappedSize: 5242880,
-          }),
-          new winstonMongoDB.MongoDB({
-            level: 'error',
-            db: mongoUri,
-            collection: 'error_logs',
-            capped: true,
-            cappedSize: 5242880,
-          }),
-        ]
-      : [];
+    const transportsArray: winston.transport[] = [];
 
-    // 🎨 Add colorized format
-    this.logger = createLogger({
-      level: 'info',
-      format: format.combine(
-        format.colorize({
-          all: true, // Colorize all logs
+    if (isProduction) {
+      transportsArray.push(
+        new winstonMongoDB.MongoDB({
+          level: 'info', // includes warn + error
+          db: mongoUri,
+          collection: 'app_logs',
+          tryReconnect: true,
+          capped: true,
+          cappedSize: 5 * 1024 * 1024, // ~5MB
         }),
-        format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss a ' }),
+        new winstonMongoDB.MongoDB({
+          level: 'error',
+          db: mongoUri,
+          collection: 'error_logs',
+          tryReconnect: true,
+          capped: true,
+          cappedSize: 5 * 1024 * 1024,
+        }),
+      );
+    } else {
+      transportsArray.push(
+        new transports.Console({
+          level: 'debug',
+          format: format.combine(format.colorize()),
+        }),
+      );
+    }
+
+    this.logger = createLogger({
+      level: isProduction ? 'info' : 'debug',
+      format: format.combine(
+        format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss a' }),
         format.errors({ stack: true }),
         format.splat(),
-        format.printf(({ timestamp, level, message, context }) => {
-          return `[${appName}] - ${timestamp} ${level} [${context}]: ${message}`;
-        })
-      ),
-      transports: [
-        new transports.Console({
-          level: isProduction ? 'info' : 'debug',
+        format.printf(({ timestamp, level, message, context, stack }) => {
+          const ctx = context || 'App';
+          const baseLog = `[${appName}] - ${timestamp} ${level} [${ctx}]: ${message}`;
+          return stack ? `${baseLog}\nStack: ${stack}` : baseLog;
         }),
-        ...mongoTransports,
-      ],
+      ),
+      transports: transportsArray,
     });
   }
 
@@ -73,7 +75,7 @@ export class WinstonConfig implements LoggerService {
   error(message: any, trace?: string, context?: string) {
     this.logger.error({
       message,
-      trace: trace || new Error().stack,
+      stack: trace || new Error().stack,
       context,
     });
   }
@@ -89,4 +91,6 @@ export class WinstonConfig implements LoggerService {
   verbose?(message: any, context?: string) {
     this.logger.verbose(message, { context });
   }
+
+
 }
