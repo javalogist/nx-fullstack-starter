@@ -28,6 +28,23 @@ export const helmetConfig = (configService: ConfigService): HelmetOptions => {
     frameSrc: ["'none'"],
   };
 
+let hstsConfig: boolean | Record<string, any> = true;
+
+const hstsRaw = configService.get<string>('HELMET_HSTS');
+try {
+  // Handle case: JSON string or plain boolean string
+  if (hstsRaw?.startsWith('{')) {
+    hstsConfig = JSON.parse(hstsRaw);
+  } else if (hstsRaw?.toLowerCase() === 'false') {
+    hstsConfig = false;
+  } else if (hstsRaw?.toLowerCase() === 'true') {
+    hstsConfig = true;
+  }
+} catch (e) {
+  console.warn('Invalid HELMET_HSTS value, falling back to default "true".');
+  hstsConfig = true;
+}
+
   const config: HelmetOptions = {
     contentSecurityPolicy: configService.get('HELMET_CSP')
       ? JSON.parse(configService.get<string>('HELMET_CSP', '{}'))
@@ -38,7 +55,7 @@ export const helmetConfig = (configService: ConfigService): HelmetOptions => {
     dnsPrefetchControl: { allow: false },
     frameguard: { action: 'sameorigin' },
     hidePoweredBy: true,
-    hsts: configService.get('HELMET_HSTS', true),
+    hsts: hstsConfig,
     noSniff: true,
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     xssFilter: true,
