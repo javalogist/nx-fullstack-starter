@@ -61,7 +61,7 @@ try {
     xssFilter: true,
   };
 
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('HELMET_LOG', 'false') === 'true') {
     console.log('Helmet Configuration:');
     console.log('- Content Security Policy:', config.contentSecurityPolicy);
     console.log('- HSTS:', config.hsts);

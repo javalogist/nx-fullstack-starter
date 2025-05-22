@@ -35,7 +35,7 @@ export const apiVersionConfig = (configService: ConfigService): VersioningOption
   }
 
   // Log configuration in development
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('API_VERSION_LOG', 'false') === 'true') {
     console.log('API Versioning Configuration:');
     console.log('- Strategy:', strategy);
     console.log('- Prefix:', prefix);

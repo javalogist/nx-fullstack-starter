@@ -7,3 +7,4 @@ export * from './compression.config';
 export * from './api-version.config';
 export * from './pipes.config';
 export * from './swagger.config';
+export * from './mongo.config';

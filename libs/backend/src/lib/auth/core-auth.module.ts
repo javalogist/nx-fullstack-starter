@@ -5,6 +5,7 @@ import {
   Type,
   ClassProvider,
   FactoryProvider,
+  ExistingProvider,
 } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -39,8 +40,10 @@ export interface CoreAuthModuleOptions<TUser extends IBaseUser> {
     google?: boolean;
   };
 
+  userModule: Type<any>;
+
   userService: (
-    ClassProvider<IUserService<TUser>> | FactoryProvider<IUserService<TUser>>
+    ClassProvider<IUserService<TUser>> | FactoryProvider<IUserService<TUser>> | ExistingProvider<IUserService<TUser>>
   ) & { provide: UserServiceToken };
 
   authService?: (
@@ -116,6 +119,7 @@ export class CoreAuthModule {
       imports: [
         PassportModule,
         ConfigModule,
+        options.userModule,
         ...(options.strategies.jwt
           ? [
             JwtModule.registerAsync({

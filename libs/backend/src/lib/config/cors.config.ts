@@ -39,7 +39,7 @@ export const corsConfig = (configService: ConfigService): CorsOptions => {
   const allowCredentials = configService.get<boolean>('ALLOW_CREDENTIALS') ?? true;
   const maxAge = configService.get<number>('MAX_AGE') ?? 3600;
 
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('CORS_LOG', 'false') === 'true') {
     console.log('CORS Configuration:');
     console.log(`- Origins: ${allowedOrigins.join(', ')}`);
     console.log(`- Methods: ${allowedMethods.join(', ')}`);

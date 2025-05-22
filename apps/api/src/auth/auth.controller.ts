@@ -1,4 +1,4 @@
-import {AUTH_SERVICE_TOKEN, IAuthService, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
+import { AUTH_SERVICE_TOKEN, IAuthService, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
 import { Body, Controller, Inject, Post, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { LoginDto } from "./login.dto";
 
@@ -20,4 +20,6 @@ export class AuthController {
       const token = await this.authService.generateToken(user);
       return { user, token };
     }
+
+    
 }

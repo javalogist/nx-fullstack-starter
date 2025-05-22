@@ -1,4 +1,4 @@
-import { Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, NotImplementedException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IBaseUser } from '@kodevy-core-2.0/shared';
@@ -6,7 +6,7 @@ import { IUserService } from '../../user/user-service.interface';
 import { IAuthService } from '../interfaces/auth-service.interface';
 import { AccessTokenPayload } from '../../types/access-token.payload';
 import { LoginType } from '@kodevy-core-2.0/shared';
-import { DEFAULT_JWT_EXPIRES_IN, OAuthProvider } from '../constants/auth.constants';
+import { DEFAULT_JWT_EXPIRES_IN, OAuthProvider, USER_SERVICE_TOKEN } from '../constants/auth.constants';
 import { GoogleOAuthPayload } from '../../types/google-oauth.payload';
 @Injectable()
 export class DefaultAuthService implements IAuthService {
@@ -32,6 +32,9 @@ export class DefaultAuthService implements IAuthService {
       throw new UnauthorizedException('User not found');
     }
     if (await this.userService.validatePassword(user, password)) {
+      if(!user.isEmailVerified){
+        throw new UnauthorizedException('Email not verified');
+      }
       return user;
     }
    throw new UnauthorizedException('Invalid credentials');
@@ -45,8 +48,6 @@ export class DefaultAuthService implements IAuthService {
     const payload: AccessTokenPayload = {
       sub: user.id,
       email: user.email,
-      iat: now,
-      exp: now + this.parseExpirationTime(expiresIn),
     };
     return this.jwtService.signAsync(payload);
   }
@@ -67,6 +68,7 @@ export class DefaultAuthService implements IAuthService {
       lastName: profile['name']?.familyName,
       profilePicture: profile['photos'][0]?.value,
       loginType:LoginType.GOOGLE,
+      isEmailVerified:true,
       roles:['user'],
     });
   }

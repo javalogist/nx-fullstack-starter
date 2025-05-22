@@ -4,6 +4,7 @@ export interface IBaseUser {
     id: string;
     googleId?:string|null;
     email: string;
+    isEmailVerified: boolean;
     password: string;
     firstName:string;
     middleName?:string|null;

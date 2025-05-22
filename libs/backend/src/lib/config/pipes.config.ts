@@ -39,7 +39,7 @@ export const pipesConfig = (configService: ConfigService): ValidationPipeOptions
   };
 
   // Log configuration in development
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('PIPES_LOG', 'false') === 'true') {
     console.log('Global Pipes Configuration:');
     console.log('- Whitelist:', whitelist);
     console.log('- Forbid Non-Whitelisted:', forbidNonWhitelisted);

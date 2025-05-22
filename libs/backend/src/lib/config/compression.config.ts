@@ -18,13 +18,14 @@ import * as compression from 'compression';
  * COMPRESSION_WINDOW_BITS=15
  */
 export const compressionConfig = (configService: ConfigService): compression.CompressionOptions => {
-  const level = configService.get<number>('COMPRESSION_LEVEL', 6);
-  const threshold = configService.get<number>('COMPRESSION_THRESHOLD', 1024);
-  const windowBits = configService.get<number>('COMPRESSION_WINDOW_BITS', 15);
+  const level = Number(configService.get('COMPRESSION_LEVEL', 6));
+  const threshold = Number(configService.get('COMPRESSION_THRESHOLD', 1024));
+  const windowBits = Number(configService.get('COMPRESSION_WINDOW_BITS', 15));
+
 
   const config: compression.CompressionOptions = {
-    level:level,
-    windowBits:windowBits as number,
+    level: level,
+    windowBits: windowBits as number,
     filter: (req: Request, res: Response) => {
       if (req.headers['x-no-compression']) {
         return false;
@@ -36,7 +37,7 @@ export const compressionConfig = (configService: ConfigService): compression.Com
   };
 
   // Log configuration in development
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('COMPRESSION_LOG', 'false') === 'true') {
     console.log('Compression Configuration:');
     console.log('- Level:', level);
     console.log('- Threshold:', threshold, 'bytes');

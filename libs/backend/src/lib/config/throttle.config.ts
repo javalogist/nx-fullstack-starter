@@ -27,7 +27,7 @@ export const throttleConfig = (
     ?.split(',')
     .map(agent => new RegExp(agent.trim())) ?? [];
 
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('THROTTLE_LOG', 'false') === 'true') {
     console.log('Throttle Configuration:');
     console.log(`- TTL: ${ttl} seconds`);
     console.log(`- Limit: ${limit} requests`);

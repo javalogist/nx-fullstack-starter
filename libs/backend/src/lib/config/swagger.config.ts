@@ -87,7 +87,7 @@ export const setupSwagger = (
     res.send(document);
   });
 
-  if (process.env['NODE_ENV'] === 'development') {
+  if (process.env['NODE_ENV'] === 'development' && configService.get<string>('SWAGGER_LOG', 'false') === 'true') {
     console.log('Swagger Configuration:');
     console.log(`- Title: ${appName}`);
     console.log(`- Version: ${version}`);

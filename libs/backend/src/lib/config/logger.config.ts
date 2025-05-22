@@ -19,7 +19,7 @@ export class WinstonLoggerService implements LoggerService {
   constructor(private configService: ConfigService) {
     const isProduction =
       this.configService.get<string>('NODE_ENV', 'development') === 'production';
-    const mongoUri = this.configService.get<string>('MONGO_URI', '');
+    const mongoUri = this.configService.get<string>('MONGO_URI_LOGS', '');
     const appName = this.configService.get<string>('APP_NAME', 'MyApp');
 
     const transportsArray: winston.transport[] = [];
