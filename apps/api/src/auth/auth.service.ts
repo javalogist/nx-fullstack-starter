@@ -1,5 +1,5 @@
-import { DefaultAuthService, EMAIL_TEMPLATES, IUserService, MailerService, USER_SERVICE_TOKEN } from "@kodevy-core-2.0/backend";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BusinessLogicException, DefaultAuthService, EMAIL_TEMPLATES, IUserService, MailerService, USER_SERVICE_TOKEN } from "@kodevy-core-2.0/backend";
+import { Inject, Injectable, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { LoginType } from "@kodevy-core-2.0/shared";
 import { CreateUserDto } from "../user/user.dto";
@@ -95,6 +95,50 @@ export class AuthService extends DefaultAuthService<User> {
       }
       throw new UnauthorizedException('Invalid verification token');
     }
+  }
+
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    // Find user by email
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new BusinessLogicException('User not found');
+    }
+
+    // Check if user is already verified
+    if (user.isEmailVerified) {
+      throw new BusinessLogicException('Email is already verified');
+    }
+
+    // Generate new verification token
+    const verificationToken = this.jwtService.sign(
+      { email: user.email, type: 'email-verification' },
+      { 
+        secret: this.configService.get('VERIFICATION_SECRET'),
+        expiresIn: '24h'
+      }
+    );
+
+    // Update user with new verification token
+    await this.userService.update(user.id.toString(), {
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    });
+
+    // Send new verification email
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'Frontend');
+    await this.mailService.send({
+      to: user.email,
+      subject: 'Verify your email',
+      template: 'verifyEmail',
+      data: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        appName: this.configService.get('APP_NAME', 'Our App'),
+        verificationLink: `${frontendUrl}/verify-email?token=${verificationToken}`,
+      },
+    });
+
+    return { message: 'Verification email sent successfully' };
   }
 }
 

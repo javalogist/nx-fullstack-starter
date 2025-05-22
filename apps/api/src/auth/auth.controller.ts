@@ -13,6 +13,10 @@ export class AuthController {
 
     @Post('login')
     @Public()
+    @ApiOperation({ summary: 'Login user' })
+    @ApiQuery({ name: 'credentials', required: true, description: 'Login credentials' })
+    @ApiResponse({ status: 200, description: 'User logged in successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
     @UseGuards(LocalAuthGuard)
     async login(@Body() credentials: LoginDto) {
       const user = await this.authService.validateUser(
@@ -28,6 +32,10 @@ export class AuthController {
 
     @Post('register')
     @Public()
+    @ApiOperation({ summary: 'Register a new user' })
+    @ApiQuery({ name: 'dto', required: true, description: 'User registration data' })
+    @ApiResponse({ status: 201, description: 'User registered successfully' })
+    @ApiResponse({ status: 400, description: 'Bad request' })
     async register(@Body() dto: CreateUserDto) {
       const user = await this.authService.registerUser(
         dto
@@ -43,5 +51,14 @@ export class AuthController {
     @ApiResponse({ status: 400, description: 'Invalid or expired token' })
     async verifyEmail(@Query('token') token: string) {
       return this.authService.verifyEmail(token);
+    }
+
+    @Post('resend-verification')
+    @Public()
+    @ApiOperation({ summary: 'Resend verification email' })
+    @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
+    @ApiResponse({ status: 400, description: 'User not found or already verified' })
+    async resendVerificationEmail(@Body('email') email: string) {
+      return this.authService.resendVerificationEmail(email);
     }
 }

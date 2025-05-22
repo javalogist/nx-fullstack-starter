@@ -1,7 +1,5 @@
 import { NotImplementedException } from "@nestjs/common";
-
 import { LoginType } from "@kodevy-core-2.0/shared";
-
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { IAuthService } from "../interfaces/auth-service.interface";
 import { IBaseUser } from "@kodevy-core-2.0/shared";
@@ -10,6 +8,7 @@ import { IUserService } from "../../user/user-service.interface";
 import { AccessTokenPayload } from "../../types/access-token.payload";
 import { OAuthProvider } from "../constants/auth.constants";
 import { GoogleOAuthPayload } from "../../types/google-oauth.payload";
+
 @Injectable()
 export class DefaultAuthService<T extends IBaseUser = IBaseUser> implements IAuthService<T> {
   constructor(
