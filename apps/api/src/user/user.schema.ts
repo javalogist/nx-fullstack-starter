@@ -31,8 +31,8 @@ export class User extends BaseSchema implements IBaseUser {
   @Prop({ required: true, trim: true })
   lastName: string;
 
-  @Prop({ required: false, default: null, unique: true, sparse: true, trim: true })
-  username?: string | null;
+  @Prop({ required: true, unique: true, sparse: true, trim: true })
+  username: string | null;
 
   @Prop({ required: false, default: null })
   profilePicture?: string | null;
@@ -53,6 +53,12 @@ export class User extends BaseSchema implements IBaseUser {
 
   @Prop({ required: true, default: Date.now })
   updatedAt: Date;
+
+  @Prop()
+  emailVerificationToken?: string;
+
+  @Prop()
+  emailVerificationTokenExpiresAt?: Date;
 }
 
 export type UserDocument = User & Document;

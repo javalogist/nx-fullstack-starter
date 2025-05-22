@@ -4,6 +4,7 @@ import {AUTH_SERVICE_TOKEN, CoreAuthModule, DefaultAuthService, USER_SERVICE_TOK
 import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
 import { AuthService } from './auth.service';
+import { MailerModule } from '@kodevy-core-2.0/backend';
 @Module({
   imports: [
     CoreAuthModule.forRoot({
@@ -11,16 +12,19 @@ import { AuthService } from './auth.service';
         jwt: true,
         local: true,
       },
-      authService: {
-        provide: AUTH_SERVICE_TOKEN,
-        useClass: AuthService,
-      },
       userService: {
         provide: USER_SERVICE_TOKEN,
         useExisting: UserService,
       },
       userModule: UserModule,
     }),
+    MailerModule,
+  ],
+  providers:[
+    {
+      provide: AUTH_SERVICE_TOKEN,
+      useClass: AuthService,
+    }
   ],
   controllers: [AuthController],
 })

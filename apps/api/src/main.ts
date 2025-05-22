@@ -35,9 +35,10 @@ async function bootstrap() {
     new ApiResponseInterceptor(),
   )
 
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
   app.useGlobalFilters(
     new BusinessLogicExceptionFilter(),
-    new GlobalExceptionFilter(),
   );
 
   const port = process.env.PORT || 3000;

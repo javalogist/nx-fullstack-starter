@@ -47,7 +47,7 @@ export interface CoreAuthModuleOptions<TUser extends IBaseUser> {
   ) & { provide: UserServiceToken };
 
   authService?: (
-    ClassProvider<IAuthService> | FactoryProvider<IAuthService>
+    ClassProvider<DefaultAuthService> | FactoryProvider<DefaultAuthService>
   ) & { provide: AuthServiceToken };
 }
 
@@ -56,7 +56,7 @@ export interface CoreAuthModuleOptions<TUser extends IBaseUser> {
 export class CoreAuthModule {
   static forRoot<TUser extends IBaseUser>(options: CoreAuthModuleOptions<TUser>): DynamicModule {
     const providers: Provider[] = [];
-    const exports: Array<Type<any> | string> = [];
+    const exports: Array<Type<any> | string> = [JwtModule];
 
 
     // ✅ Validate strategy config
@@ -106,7 +106,7 @@ export class CoreAuthModule {
       providers.push({
         provide: AUTH_SERVICE_TOKEN,
         useFactory: (jwtService: JwtService, userService: IUserService<TUser>) => {
-          return new DefaultAuthService(jwtService, userService);
+          return new DefaultAuthService<TUser>(jwtService, userService);
         },
         inject: [JwtService, options.userService.provide, ConfigService],
       });

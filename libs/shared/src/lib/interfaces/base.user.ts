@@ -11,7 +11,7 @@ export interface IBaseUser {
     firstName:string;
     middleName?:string|null;
     lastName:string;
-    username?: string|null;
+    username: string;
     profilePicture?:string|null;
     roles: string[];
     loginType: LoginType;

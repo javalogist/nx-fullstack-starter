@@ -9,6 +9,7 @@ export class BusinessLogicExceptionFilter implements ExceptionFilter {
   private readonly logger = Logger;
 
   catch(exception: BusinessLogicException, host: ArgumentsHost) {
+    console.log('catched in  BusinessLogicExceptionFilter');
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 

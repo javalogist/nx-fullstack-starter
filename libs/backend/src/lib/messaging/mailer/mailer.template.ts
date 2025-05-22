@@ -7,7 +7,7 @@ export const EMAIL_TEMPLATES: Record<string, MailerTemplate> = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1>Welcome to {{appName}}!</h1>
-        <p>Hello {{name}},</p>
+        <p>Hello {{firstName}} {{lastName}},</p>
         <p>Thank you for joining {{appName}}. We're excited to have you on board!</p>
         <p>Best regards,<br>The {{appName}} Team</p>
       </div>
@@ -20,7 +20,7 @@ export const EMAIL_TEMPLATES: Record<string, MailerTemplate> = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1>Verify Your Email</h1>
-        <p>Hello {{name}},</p>
+        <p>Hello {{firstName}} {{lastName}},</p>
         <p>Please click the button below to verify your email address:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="{{verificationLink}}" 
@@ -40,7 +40,7 @@ export const EMAIL_TEMPLATES: Record<string, MailerTemplate> = {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1>Reset Your Password</h1>
-        <p>Hello {{name}},</p>
+        <p>Hello {{firstName}} {{lastName}},</p>
         <p>We received a request to reset your password. Click the button below to create a new password:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="{{resetLink}}" 
