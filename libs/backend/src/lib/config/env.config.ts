@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
-
+import mailerConfig from './mailer.config';
 @Module({
   imports: [
     NestConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: getEnvPath()
+      envFilePath: getEnvPath(),
+      load: [mailerConfig],
     }),
   ],
 })
@@ -24,3 +25,4 @@ function getEnvPath(): string {
       return '.env';
   }
 }
+

@@ -105,8 +105,8 @@ export class CoreAuthModule {
     } else {
       providers.push({
         provide: AUTH_SERVICE_TOKEN,
-        useFactory: (jwtService: JwtService, userService: IUserService<TUser>, configService: ConfigService) => {
-          return new DefaultAuthService(jwtService, userService, configService);
+        useFactory: (jwtService: JwtService, userService: IUserService<TUser>) => {
+          return new DefaultAuthService(jwtService, userService);
         },
         inject: [JwtService, options.userService.provide, ConfigService],
       });

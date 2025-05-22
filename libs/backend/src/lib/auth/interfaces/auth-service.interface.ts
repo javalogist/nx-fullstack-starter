@@ -5,6 +5,7 @@ export interface IAuthService {
   // Core authentication methods
   findById(id: string): Promise<IBaseUser>;
   validateUser(email: string, password: string): Promise<IBaseUser>;
+  registerUser(email:string, password:string): Promise<IBaseUser>;
   
   // JWT related methods
   generateToken(user: IBaseUser): Promise<string>;

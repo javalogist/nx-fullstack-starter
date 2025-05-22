@@ -5,6 +5,8 @@ export interface IBaseUser {
     googleId?:string|null;
     email: string;
     isEmailVerified: boolean;
+    emailVerificationToken?:string|null;
+    emailVerificationTokenExpiresAt?:Date|null;
     password: string;
     firstName:string;
     middleName?:string|null;

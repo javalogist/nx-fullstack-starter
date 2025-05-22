@@ -7,7 +7,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
-
+import { MailerModule } from '@kodevy-core-2.0/backend';
 @Module({
   imports: [
     AppConfigModule,
@@ -20,7 +20,7 @@ import { UserModule } from '../user/user.module';
       connectionName: 'user',
       configKey: 'MONGO_URI_USER',
     }),
-
+    MailerModule,
     AuthModule,
     UserModule,
   ],
