@@ -1,4 +1,5 @@
-export const AUTH_SERVICE = 'AUTH_SERVICE';
+export const AUTH_SERVICE_TOKEN = 'AUTH_SERVICE';
+export const USER_SERVICE_TOKEN = 'USER_SERVICE';
 
 export const JWT_STRATEGY = 'jwt';
 export const LOCAL_STRATEGY = 'local';

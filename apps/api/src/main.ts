@@ -19,7 +19,7 @@ async function bootstrap() {
 
   app.use(helmet(helmetConfig(configService)));
   app.enableCors(corsConfig(configService));
-  app.use(compression(compressionConfig(configService)));
+ // app.use(compression(compressionConfig(configService)));
 
   app.enableVersioning(apiVersionConfig(configService));
 

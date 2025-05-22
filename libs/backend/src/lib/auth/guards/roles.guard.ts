@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '@kodevy-core-2.0/shared';
-import { ROLES_KEY } from '../decorators/roles.decorator';
 import { IBaseUser } from '@kodevy-core-2.0/shared';
+import { ROLES_KEY } from '../constants';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

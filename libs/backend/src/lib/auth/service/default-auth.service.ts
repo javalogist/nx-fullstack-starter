@@ -26,12 +26,15 @@ export class DefaultAuthService implements IAuthService {
   }
 
   //used by local strategy to validate the user
-  async validateUser(email: string, password: string): Promise<IBaseUser | null> {
+  async validateUser(email: string, password: string): Promise<IBaseUser> {
     const user = await this.userService.findByEmail(email);
-    if (user && await this.userService.validatePassword(user, password)) {
+    if(!user){
+      throw new UnauthorizedException('User not found');
+    }
+    if (await this.userService.validatePassword(user, password)) {
       return user;
     }
-    return null;
+   throw new UnauthorizedException('Invalid credentials');
   }
 
   //used by controller to generate the token
