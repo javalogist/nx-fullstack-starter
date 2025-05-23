@@ -4,7 +4,6 @@ import { LoginDto } from "./login.dto";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "../user/user.dto";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from "@nestjs/passport";
 import { User } from "../user/user.schema";
 
 @ApiTags('Auth')

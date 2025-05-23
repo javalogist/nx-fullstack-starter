@@ -5,13 +5,13 @@ import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 @Module({})
 export class MongoConnectionModule {
     static forRootAsync(options: {
-        connectionName: string;
+        connectionName: string|null;
         configKey: string;
     }): DynamicModule {
         const { connectionName, configKey } = options;
 
         const mongoModule = MongooseModule.forRootAsync({
-            connectionName,
+            connectionName: connectionName || undefined,
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (configService: ConfigService): Promise<MongooseModuleOptions> => {

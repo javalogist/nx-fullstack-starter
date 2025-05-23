@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AppConfigModule, throttleConfig, WinstonLoggerService, HealthCheckModule, JwtAuthGuard, RolesGuard, MongoConnectionModule } from '@kodevy-core-2.0/backend';
 import { ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -15,6 +13,11 @@ import { UserModule } from '../user/user.module';
       useFactory: throttleConfig,
     }),
     HealthCheckModule.register(),
+    
+    MongoConnectionModule.forRootAsync({
+      connectionName: null,
+      configKey: 'MONGO_URI',
+    }),
     MongoConnectionModule.forRootAsync({
       connectionName: 'user',
       configKey: 'MONGO_URI_USER',
@@ -22,7 +25,6 @@ import { UserModule } from '../user/user.module';
     AuthModule,
     UserModule,
   ],
-  controllers: [AppController],
   providers: [
     WinstonLoggerService,
     {
@@ -37,7 +39,6 @@ import { UserModule } from '../user/user.module';
       provide:'APP_GUARD',
       useClass:RolesGuard
     },
-    AppService,
     
   ],
 })

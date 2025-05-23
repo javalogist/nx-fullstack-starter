@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { IBaseUser } from '@kodevy-core-2.0/shared';
 import { LoginType } from '@kodevy-core-2.0/shared';
-import { BaseSchema } from '../base.schema';
+import { BaseSchema } from '../common/base.schema';
 
 @Schema({
   timestamps: true, // This will automatically add createdAt and updatedAt fields

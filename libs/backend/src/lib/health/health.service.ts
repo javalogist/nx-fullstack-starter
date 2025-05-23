@@ -7,7 +7,6 @@ import {
   MongooseHealthIndicator,
   MemoryHealthIndicator,
   HealthCheckResult,
-  HealthIndicatorResult,
   HttpHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
@@ -20,15 +19,14 @@ export class HealthService {
     private mongoose: MongooseHealthIndicator,
     private http: HttpHealthIndicator,
     private db: TypeOrmHealthIndicator,
-
   ) { }
 
   check(): Promise<HealthCheckResult> {
     const checks = [
       () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-      () => this.mongoose!.pingCheck('mongo') as Promise<HealthIndicatorResult>,
+      () => this.mongoose.pingCheck('mongo'),   
       () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
-      () => this.db.pingCheck('database')
+      // () => this.db.pingCheck('database')
     ];
     return this.health.check(checks);
   }

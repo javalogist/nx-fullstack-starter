@@ -1,6 +1,7 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 
 /**
  * Configures Swagger documentation for NestJS applications
@@ -96,4 +97,6 @@ export const setupSwagger = (
     console.log(`- UI Path: /${swaggerPath}`);
     console.log(`- JSON Path: /${jsonPath}`);
   }
+  
+  Logger.debug('Swagger Configuration: jsonPath: '+jsonPath +' swaggerPath: '+swaggerPath);
 };
