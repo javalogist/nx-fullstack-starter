@@ -26,12 +26,15 @@ export class UserService implements IUserService<User>{
     findAll(): Promise<User[]> {
         return this.userModel.find();
     }
+
     findById(id: string): Promise<User> {
         return this.userModel.findById(id);
     }
+
     findByEmail(email: string): Promise<User> {
         return this.userModel.findOne({ email });
     }
+
     async create(userData: Partial<User>): Promise<User> {
         // Check if user with email already exists
         const existingUser = await this.userModel.findOne({ email: userData.email });
@@ -61,23 +64,25 @@ export class UserService implements IUserService<User>{
         // Create new user
         return this.userModel.create(userData);
     }
+
     update(id: string, userData: Partial<User>): Promise<User> {
         return this.userModel.findByIdAndUpdate(id, userData, { new: true });
     }
+
     delete(id: string): Promise<void> {
         return this.userModel.findByIdAndDelete(id);
     }
+
     validateUser(email: string, password: string): Promise<User> {
         return this.userModel.findOne({ email, password });
     }
+
     validatePassword(user: User, password: string): Promise<boolean> {
         return this.userModel.findOne({ email: user.email, password });
     }
+
     findOrCreateOAuthUser(provider: string, email: string, profile: any): Promise<User> {
         return this.userModel.findOne({ email });
     }
 
-    
-
-    
 }

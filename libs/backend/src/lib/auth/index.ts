@@ -6,4 +6,5 @@ export * from './guards/index';
 export * from './interfaces/index';
 export * from './service/index';
 export * from './strategies/index';
+export * from './interfaces/auth-service.interface';
 

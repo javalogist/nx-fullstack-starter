@@ -1,4 +1,4 @@
-import { AUTH_SERVICE_TOKEN, IAuthService, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
+import {LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
 import { Body, Controller, Inject, Post, UnauthorizedException, UseGuards, Get, Query } from "@nestjs/common";
 import { LoginDto } from "./login.dto";
 import { AuthService } from "./auth.service";
@@ -8,7 +8,7 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject(AUTH_SERVICE_TOKEN) private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
 
     @Post('login')

@@ -1,20 +1,73 @@
-import { BusinessLogicException, DefaultAuthService, EMAIL_TEMPLATES, IUserService, MailerService, USER_SERVICE_TOKEN } from "@kodevy-core-2.0/backend";
-import { Inject, Injectable, UnauthorizedException, BadRequestException } from "@nestjs/common";
+import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload} from "@kodevy-core-2.0/backend";
+import {  Injectable, NotImplementedException, Scope, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { LoginType } from "@kodevy-core-2.0/shared";
 import { CreateUserDto } from "../user/user.dto";
 import { User } from "../user/user.schema";
 import { ConfigService } from "@nestjs/config";
+import { UserService } from "../user/user.service";
 
-@Injectable()
-export class AuthService extends DefaultAuthService<User> {
+@Injectable({scope: Scope.DEFAULT})
+export class AuthService implements IAuthService<User> {
   constructor(
-    protected readonly jwtService: JwtService,
+    private readonly jwtService: JwtService,
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
-    @Inject(USER_SERVICE_TOKEN) userService: IUserService<User>,
+    private readonly userService: UserService,
   ) {
-    super(jwtService, userService);
+    console.log('REAL AuthService INIT', Date.now());
+  }
+
+  async findById(id: string): Promise<User> {
+    const user = await this.userService.findById(id);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
+  }
+
+  async validateUser(email: string, password: string): Promise<User> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    if (await this.userService.validatePassword(user, password)) {
+      if (!user.isEmailVerified) {
+        throw new UnauthorizedException('Email not verified');
+      }
+      return user;
+    }
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  async generateToken(user: User): Promise<string> {
+    const payload: AccessTokenPayload = {
+      sub: user.id,
+      email: user.email,
+    };
+    return this.jwtService.signAsync(payload);
+  }
+
+  async findOrCreateOAuthUser(provider: OAuthProvider, profile: Record<string, any>): Promise<User> {
+    if (provider === OAuthProvider.GOOGLE) {
+      profile = profile as GoogleOAuthPayload;
+
+      const user = await this.userService.findByEmail(profile['emails'][0]?.value);
+      if (user) {
+        return user;
+      }
+      return await this.userService.create({
+        email: profile['emails'][0]?.value,
+        password: '',
+        firstName: profile['name']?.givenName,
+        lastName: profile['name']?.familyName,
+        profilePicture: profile['photos'][0]?.value,
+        loginType: LoginType.GOOGLE,
+        isEmailVerified: true,
+        roles: ['user'],
+      } as Partial<User>);
+    }
+    throw new NotImplementedException(`OAuth provider ${provider} not implemented`);
   }
 
   async registerUser(dto: CreateUserDto): Promise<User> {
