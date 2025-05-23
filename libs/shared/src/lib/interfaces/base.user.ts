@@ -15,6 +15,8 @@ export interface IBaseUser {
     profilePicture?:string|null;
     roles: string[];
     loginType: LoginType;
+    googleAccessToken?:string|null;
+    googleRefreshToken?:string|null;
     createdAt: Date;
     updatedAt: Date;
 }

@@ -10,7 +10,7 @@ export class UserService implements IUserService<User>{
         @InjectModel(User.name,'user') private userModel: Model<User>
     ){}
 
-    private generateUsername(firstName: string, middleName: string, lastName: string): string {
+    private generateUsername(firstName: string, middleName: string, lastName: string|null =null): string {
         const firstInitial = firstName ? firstName.charAt(0).toLowerCase() : '';
         const middleInitial = middleName ? middleName.charAt(0).toLowerCase() : '';
         const lastInitial = lastName ? lastName.charAt(0).toLowerCase() : '';
@@ -21,6 +21,14 @@ export class UserService implements IUserService<User>{
     private async isUsernameUnique(username: string): Promise<boolean> {
         const existingUser = await this.userModel.findOne({ username });
         return !existingUser;
+    }
+
+    public async getUsername(firstName: string, middleName: string, lastName: string|null =null): Promise<string> {
+        const username = this.generateUsername(firstName, middleName, lastName);
+        if (await this.isUsernameUnique(username)) {
+            return username;
+        }
+        return this.getUsername(firstName, middleName, lastName);
     }
 
     findAll(): Promise<User[]> {
@@ -42,24 +50,10 @@ export class UserService implements IUserService<User>{
             throw new BusinessLogicException('User with this email already exists');
         }
         
-        // Generate unique username
-        let username = this.generateUsername(
-            userData.firstName || '',
-            userData.middleName || '',
-            userData.lastName || ''
-        );
-        
-        // Ensure username is unique
-        while (!(await this.isUsernameUnique(username))) {
-            username = this.generateUsername(
-                userData.firstName || '',
-                userData.middleName || '',
-                userData.lastName || ''
-            );
-        }
+       
         
         // Add username to userData
-        userData.username = username;
+        userData.username = await this.getUsername(userData.firstName, userData.middleName, userData.lastName);
         
         // Create new user
         return this.userModel.create(userData);

@@ -1,9 +1,11 @@
-import {LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
-import { Body, Controller, Inject, Post, UnauthorizedException, UseGuards, Get, Query } from "@nestjs/common";
+import {CurrentUser, GoogleAuthGuard, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
+import { Body, Controller, Inject, Post, UnauthorizedException, UseGuards, Get, Query, Req } from "@nestjs/common";
 import { LoginDto } from "./login.dto";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "../user/user.dto";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from "@nestjs/passport";
+import { User } from "../user/user.schema";
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -28,6 +30,21 @@ export class AuthController {
       }
       const token = await this.authService.generateToken(user);
       return { user, token };
+    }
+
+    @Get('google')
+    @Public()
+    @UseGuards(GoogleAuthGuard)
+    async googleAuth(@Req() req) {
+      // Redirect to Google login
+    }
+  
+    @Get('google/redirect')
+    @Public()
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@CurrentUser() user: User) {
+      const token = await this.authService.generateToken(user);
+      return { user, token }; // handle login/registration here
     }
 
     @Post('register')

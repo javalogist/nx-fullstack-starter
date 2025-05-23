@@ -19,7 +19,12 @@ export class User extends BaseSchema implements IBaseUser {
   @Prop({ required: true, default: false })
   isEmailVerified: boolean;
 
-  @Prop({ required: true })
+  @Prop({
+    required: function () {
+      return this.loginType === LoginType.LOCAL;
+    },
+    type: String,
+  })
   password: string;
 
   @Prop({ required: true, trim: true })
@@ -47,6 +52,12 @@ export class User extends BaseSchema implements IBaseUser {
     default: LoginType.LOCAL,
   })
   loginType: LoginType;
+
+  @Prop({ required: false, default: null })
+  googleAccessToken?: string | null;
+
+  @Prop({ required: false, default: null })
+  googleRefreshToken?: string | null;
 
   @Prop({ required: true, default: Date.now })
   createdAt: Date;

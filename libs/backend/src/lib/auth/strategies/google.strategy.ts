@@ -18,16 +18,27 @@ export class GoogleStrategy extends PassportStrategy(Strategy,GOOGLE_STRATEGY) {
       clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
       callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
       scope: ['email', 'profile'],
+      accessType: 'offline',
     } as StrategyOptions);
   }
+
+   // Override authorizationParams to force prompt
+  override authorizationParams() {
+    return {
+      prompt: 'consent select_account', // force consent & account chooser
+      access_type: 'offline',           // ensure offline for refresh token
+    };
+  }
+
 
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: GoogleOAuthPayload,
+    profile: any,
     done: VerifyCallback
   ): Promise<any> {
-    const user = await this.authService.findOrCreateOAuthUser(OAuthProvider.GOOGLE, profile);
+    const googlePayload: GoogleOAuthPayload = {...profile._json,accessToken,refreshToken};
+    const user = await this.authService.findOrCreateOAuthUser(OAuthProvider.GOOGLE, googlePayload);
     done(null, user);
   }
 }

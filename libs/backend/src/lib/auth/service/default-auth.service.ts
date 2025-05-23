@@ -48,21 +48,24 @@ export class DefaultAuthService<T extends IBaseUser = IBaseUser> implements IAut
 
   async findOrCreateOAuthUser(provider: OAuthProvider, profile: Record<string, any>): Promise<T> {
     if (provider === OAuthProvider.GOOGLE) {
-      profile = profile as GoogleOAuthPayload;
+      const googleProfile = profile as GoogleOAuthPayload;
 
-      const user = await this.userService.findByEmail(profile['emails'][0]?.value);
+      const user = await this.userService.findByEmail(googleProfile.email);
       if (user) {
         return user;
       }
       return await this.userService.create({
-        email: profile['emails'][0]?.value,
+        googleId: googleProfile.sub,
+        email: googleProfile.email,
         password: '',
-        firstName: profile['name']?.givenName,
-        lastName: profile['name']?.familyName,
-        profilePicture: profile['photos'][0]?.value,
+        firstName: googleProfile.given_name,
+        lastName: googleProfile.family_name,
+        profilePicture: googleProfile.picture,
         loginType: LoginType.GOOGLE,
-        isEmailVerified: true,
+        isEmailVerified: googleProfile.email_verified,
         roles: ['user'],
+        googleAccessToken: googleProfile.accessToken,
+        googleRefreshToken: googleProfile.refreshToken,
       } as Partial<T>);
     }
     throw new NotImplementedException(`OAuth provider ${provider} not implemented`);

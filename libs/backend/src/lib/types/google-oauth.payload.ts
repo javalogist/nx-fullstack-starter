@@ -1,13 +1,14 @@
 export type GoogleOAuthPayload = {
-    id: string;
-    displayName: string;
-    name?: {
-      familyName?: string;
-      givenName?: string;
-    };
-    emails?: { value: string; verified?: boolean }[];
-    photos?: { value: string }[];
-    provider: 'google';
-    _json?: any; // raw JSON Google sends, can be handy for extra data
+  sub:string;
+  name:string;
+  given_name:string;
+  family_name:string;
+  picture:string;
+  email:string;
+  email_verified:boolean;
+  accessToken?:string|null;
+  refreshToken?:string|null;
   }
+  
+
   
