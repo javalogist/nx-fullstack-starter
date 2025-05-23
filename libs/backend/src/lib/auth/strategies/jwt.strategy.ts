@@ -4,12 +4,15 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { IBaseUser } from '@kodevy-core-2.0/shared';
 import { IAuthService } from '../interfaces/auth-service.interface';
-  import { AccessTokenPayload } from '../../types/access-token.payload';
+import { AccessTokenPayload } from '../../types/access-token.payload';
+import { AUTH_SERVICE_TOKEN, JWT_STRATEGY } from '../constants';
+
+
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy,JWT_STRATEGY) {
   constructor(
     private configService: ConfigService,
-    private authService: IAuthService
+    @Inject(AUTH_SERVICE_TOKEN) private authService: IAuthService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

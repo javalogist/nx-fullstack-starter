@@ -8,10 +8,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '@kodevy-core-2.0/backend';
 import { LocalStrategy } from '@kodevy-core-2.0/backend';
-import { JwtAuthGuard } from '@kodevy-core-2.0/backend';
 import { LocalAuthGuard } from '@kodevy-core-2.0/backend';
-import { RolesGuard } from '@kodevy-core-2.0/backend';
 import { jwtConfig } from '@kodevy-core-2.0/backend';
+import { AUTH_SERVICE_TOKEN } from '@kodevy-core-2.0/backend';
 
 @Module({
   imports: [
@@ -25,46 +24,19 @@ import { jwtConfig } from '@kodevy-core-2.0/backend';
     }),
   ],
   providers: [
-    // Auth Service
     AuthService,
-    
-    // Strategies
     {
-      provide: JwtStrategy,
-      useFactory: (configService: ConfigService, authService: AuthService) => {
-        return new JwtStrategy(configService, authService);
-      },
-      inject: [ConfigService, AuthService],
+      provide: AUTH_SERVICE_TOKEN,
+      useExisting: AuthService,
     },
-    {
-      provide: GoogleStrategy,
-      useFactory: (configService: ConfigService, authService: AuthService) => {
-        return new GoogleStrategy(configService, authService);
-      },
-      inject: [ConfigService, AuthService],
-    },
-    {
-      provide: LocalStrategy,
-      useFactory: (authService: AuthService) => {
-        return new LocalStrategy(authService);
-      },
-      inject: [AuthService],
-    },
-
-    // Guards
-    JwtAuthGuard,
+    JwtStrategy,
+    GoogleStrategy,
+    LocalStrategy,
     LocalAuthGuard,
     GoogleAuthGuard,
-    RolesGuard,
   ],
   exports: [
-    // Export service for other modules to use
-    AuthService,
-    // Export guards for route protection
-    JwtAuthGuard,
-    LocalAuthGuard,
-    GoogleAuthGuard,
-    RolesGuard,
+    AuthService
   ],
   controllers: [AuthController],
 })

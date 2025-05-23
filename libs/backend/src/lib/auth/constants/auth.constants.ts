@@ -1,3 +1,5 @@
+export const AUTH_SERVICE_TOKEN = Symbol('AUTH_SERVICE');
+
 export const JWT_STRATEGY = 'jwt';
 export const LOCAL_STRATEGY = 'local';
 export const GOOGLE_STRATEGY = 'google';
