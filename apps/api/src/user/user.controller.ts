@@ -7,7 +7,7 @@ import { Public, Roles } from "@kodevy-core-2.0/backend";
 import { Role } from "@kodevy-core-2.0/shared";
 
 
-@Controller('users')
+@Controller('user')
 export class UserController {
  constructor(private readonly userService: UserService) {}
 
@@ -18,7 +18,7 @@ export class UserController {
  }
 
  @Post()
- @Public()
+ @Roles(Role.SUPER_ADMIN)
  async createUser(@Body() userDto: CreateUserDto): Promise<User> {
    const user = plainToInstance(User, userDto);
     return this.userService.create(user);

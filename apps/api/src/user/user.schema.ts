@@ -5,7 +5,7 @@ import { LoginType } from '@kodevy-core-2.0/shared';
 import { BaseSchema } from '../common/base.schema';
 
 @Schema({
-  timestamps: true, // This will automatically add createdAt and updatedAt fields
+  timestamps: true, 
   collection: 'users'
 })
 export class User extends BaseSchema implements IBaseUser {
@@ -74,6 +74,27 @@ export class User extends BaseSchema implements IBaseUser {
 
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Configure schema to include virtuals
+UserSchema.set('toJSON', {
+  virtuals: true,
+  transform: (doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  },
+});
+
+UserSchema.set('toObject', {
+  virtuals: true,
+  transform: (doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  },
+});
 
 // Add indexes for better query performance
 //for email and username, unique true will create the index

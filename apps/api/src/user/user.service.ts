@@ -1,7 +1,7 @@
 import { BusinessLogicException, IUserService } from "@kodevy-core-2.0/backend";
 import { Injectable } from "@nestjs/common";
 import { User } from "./user.schema";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 
 @Injectable()
@@ -36,7 +36,7 @@ export class UserService implements IUserService<User>{
     }
 
     findById(id: string): Promise<User> {
-        return this.userModel.findById(id);
+        return this.userModel.findOne({_id: new Types.ObjectId(id)});
     }
 
     findByEmail(email: string): Promise<User> {

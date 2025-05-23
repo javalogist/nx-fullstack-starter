@@ -1,5 +1,5 @@
 import {CurrentUser, GoogleAuthGuard, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
-import { Body, Controller, Inject, Post, UnauthorizedException, UseGuards, Get, Query, Req } from "@nestjs/common";
+import { Body, Controller, Post, UnauthorizedException, UseGuards, Get, Query, Req } from "@nestjs/common";
 import { LoginDto } from "./login.dto";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "../user/user.dto";
@@ -24,9 +24,6 @@ export class AuthController {
         credentials.email,
         credentials.password
       );
-      if (!user) {
-        throw new UnauthorizedException();
-      }
       const token = await this.authService.generateToken(user);
       return { user, token };
     }
@@ -64,7 +61,7 @@ export class AuthController {
     @ApiOperation({ summary: 'Verify user email address' })
     @ApiQuery({ name: 'token', required: true, description: 'Email verification token' })
     @ApiResponse({ status: 200, description: 'Email verified successfully' })
-    @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+    @ApiResponse({ status: 401, description: 'Invalid or expired token' })
     async verifyEmail(@Query('token') token: string) {
       return this.authService.verifyEmail(token);
     }
@@ -73,7 +70,7 @@ export class AuthController {
     @Public()
     @ApiOperation({ summary: 'Resend verification email' })
     @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
-    @ApiResponse({ status: 400, description: 'User not found or already verified' })
+    @ApiResponse({ status: 200, description: 'User not found or already verified' })
     async resendVerificationEmail(@Body('email') email: string) {
       return this.authService.resendVerificationEmail(email);
     }
