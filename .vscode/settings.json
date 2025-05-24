@@ -1,0 +1,8 @@
+{
+    "editor.fontSize": 13,
+    "editor.fontVariations": false,
+    "workbench.tree.stickyScrollMaxItemCount": 7,
+    "files.exclude": {
+        "**/tmp": true
+    }
+}

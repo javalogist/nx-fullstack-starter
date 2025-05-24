@@ -16,6 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@kodevy-core-2.0/backend": ["libs/backend/src/index.ts"],
+      "@kodevy-core-2.0/frontend/client": ["libs/frontend/src/index.ts"],
+      "@kodevy-core-2.0/frontend/server": ["libs/frontend/src/server.ts"],
       "@kodevy-core-2.0/shared": ["libs/shared/src/index.ts"]
     }
   },

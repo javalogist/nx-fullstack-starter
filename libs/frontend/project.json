@@ -1,0 +1,29 @@
+{
+  "name": "frontend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project frontend --web",
+  "targets": {
+   "typecheck:client": {
+  "executor": "@nx/js:tsc",
+  "options": {
+    "outputPath": "dist/out-tsc/libs/frontend/client",
+    "main": "libs/frontend/src/index.ts",
+    "tsConfig": "libs/frontend/tsconfig.lib.json",
+    "noEmit": true
+  }
+},
+"typecheck:server": {
+  "executor": "@nx/js:tsc",
+  "options": {
+    "outputPath": "dist/out-tsc/libs/frontend/server",
+    "main": "libs/frontend/src/server.ts",
+    "tsConfig": "libs/frontend/tsconfig.lib.json",
+    "noEmit": true
+  }
+}
+
+  }
+}

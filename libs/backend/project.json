@@ -4,6 +4,15 @@
   "sourceRoot": "libs/backend/src",
   "projectType": "library",
   "tags": [],
-  "// targets": "to see all targets run: nx show project backend --web",
-  "targets": {}
+  "targets": {
+    "typecheck": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/out-tsc/libs/backend",
+        "main": "libs/backend/src/index.ts",
+        "tsConfig": "libs/backend/tsconfig.lib.json",
+        "noEmit": true
+      }
+    }
+  }
 }
