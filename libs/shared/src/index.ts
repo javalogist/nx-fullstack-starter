@@ -4,4 +4,5 @@ export * from './lib/types/login-type';
 export * from './lib/interfaces/api.response';
 export * from './lib/interfaces/api-error.response';
 export * from './lib/interfaces/api-result';
+export * from './lib/models/index';
 

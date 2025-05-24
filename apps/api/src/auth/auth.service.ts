@@ -1,9 +1,9 @@
-import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload, comparePassword} from "@kodevy-core-2.0/backend";
+import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload, comparePassword, toModel} from "@kodevy-core-2.0/backend";
 import {  Injectable, NotImplementedException, Scope, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { LoginType, Role } from "@kodevy-core-2.0/shared";
+import { LoginType, Role, UserModel } from "@kodevy-core-2.0/shared";
 import { CreateUserDto } from "../user/dtos/user.dto";
-import { User } from "../user/schemas/user.schema";
+import { User, UserDocument } from "../user/schemas/user.schema";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../user/user.service";
 

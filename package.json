@@ -2,7 +2,9 @@
   "name": "@kodevy-core-2.0/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "generate-types": "ts-node scripts/generate-types.ts"
+  },
   "private": true,
   "devDependencies": {
     "@nx/eslint": "20.8.0",
@@ -28,6 +30,7 @@
     "nx": "^20.8.0",
     "prettier": "^3.2.5",
     "ts-node": "10.9.1",
+    "ts-morph": "^21.0.1",
     "typescript": "~5.4.2",
     "webpack-cli": "^5.1.4"
   },

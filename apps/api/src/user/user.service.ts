@@ -1,14 +1,14 @@
-import { BusinessLogicException, IUserService } from "@kodevy-core-2.0/backend";
+import { BusinessLogicException } from "@kodevy-core-2.0/backend";
 import { Injectable } from "@nestjs/common";
-import { User } from "./schemas/user.schema";
+import { User, UserDocument } from "./schemas/user.schema";
 import { Model, Types } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class UserService implements IUserService<User> {
+export class UserService {
     constructor(
-        @InjectModel(User.name, 'user') private userModel: Model<User>
+        @InjectModel(User.name, 'user') private userModel: Model<UserDocument>
     ) { }
 
     private generateUsername(firstName: string, middleName: string, lastName: string | null = null): string {
@@ -33,15 +33,15 @@ export class UserService implements IUserService<User> {
         return this.getUsername(firstName, middleName, lastName);
     }
 
-    findAll(): Promise<User[]> {
+    findAll(): Promise<UserDocument[]> {
         return this.userModel.find();
     }
 
-    findById(id: string): Promise<User> {
+    findById(id: string): Promise<UserDocument> {
         return this.userModel.findOne({ _id: new Types.ObjectId(id) });
     }
 
-    async findByEmail(email: string): Promise<User> {
+    async findByEmail(email: string): Promise<UserDocument> {
         const user = await this.userModel.findOne({ email });
         if (!user) {
             throw new BusinessLogicException('User not found');
@@ -49,7 +49,7 @@ export class UserService implements IUserService<User> {
         return user;
     }
 
-    async create(userData: Partial<User>): Promise<User> {
+    async create(userData: Partial<User>): Promise<UserDocument> {
         // Check if user with email already exists
         const existingUser = await this.userModel.findOne({ email: userData.email });
         if (existingUser) {
@@ -63,7 +63,7 @@ export class UserService implements IUserService<User> {
         return this.userModel.create(userData);
     }
 
-    update(id: string, userData: Partial<User>): Promise<User> {
+    update(id: string, userData: Partial<User>): Promise<UserDocument> {
         return this.userModel.findByIdAndUpdate(id, userData, { new: true });
     }
 
@@ -71,7 +71,7 @@ export class UserService implements IUserService<User> {
         return this.userModel.findByIdAndDelete(id);
     }
 
-    findOrCreateOAuthUser(provider: string, email: string, profile: any): Promise<User> {
+    findOrCreateOAuthUser(provider: string, email: string, profile: any): Promise<UserDocument> {
         return this.userModel.findOne({ email });
     }
 
