@@ -30,11 +30,11 @@
     "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
-    "../../apps/app/.next/types/**/*.ts",
-    "../../dist/apps/app/.next/types/**/*.ts",
+    ".next/types/**/*.ts",
+    "../../dist/web/.next/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    "../../dist/app/.next/types/**/*.ts"
+    "../../dist/web/.next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

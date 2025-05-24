@@ -1,7 +1,7 @@
 {
-  "name": "app",
+  "name": "web",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/app",
+  "sourceRoot": "apps/web",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -9,19 +9,19 @@
       "executor": "@nx/next:server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "app:build",
+        "buildTarget": "web:build",
         "dev": true,
         "turbo": true,
         "port":4001
       },
       "configurations": {
         "development": {
-          "buildTarget": "app:build:development",
+          "buildTarget": "web:build:development",
           "dev": true,
           "port":4001
         },
         "production": {
-          "buildTarget": "app:build:production",
+          "buildTarget": "web:build:production",
           "dev": false,
           "port":4001
         }
@@ -33,7 +33,7 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/app"
+        "outputPath": "dist/web"
       },
       "configurations": {
         "development": {},
@@ -44,8 +44,8 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx nx run app:build",
-          "node scripts/build-nextjs-standalone.js app"
+          "npx nx run web:build",
+          "node scripts/build-nextjs-standalone.js web"
         ],
         "parallel": false
       }
