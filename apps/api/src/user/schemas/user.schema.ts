@@ -12,7 +12,7 @@ import { comparePassword, hashPassword } from '@kodevy-core-2.0/backend';
 export class User extends BaseSchema implements IBaseUser {
 
   @Prop({ required: false, default: null })
-  googleId?: string | null;
+  googleId: string | null;
 
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
@@ -32,7 +32,7 @@ export class User extends BaseSchema implements IBaseUser {
   firstName: string;
 
   @Prop({ required: false, default: null, trim: true })
-  middleName?: string | null;
+  middleName: string | null;
 
   @Prop({ required: true, trim: true })
   lastName: string;
@@ -41,7 +41,7 @@ export class User extends BaseSchema implements IBaseUser {
   username: string | null;
 
   @Prop({ required: false, default: null })
-  profilePicture?: string | null;
+  profilePicture: string | null;
 
   @Prop({ required: true, type: [String], default: ['user'] })
   roles: string[];
@@ -55,16 +55,16 @@ export class User extends BaseSchema implements IBaseUser {
   loginType: LoginType;
 
   @Prop({ required: false, default: null })
-  googleAccessToken?: string | null;
+  googleAccessToken: string | null;
 
   @Prop({ required: false, default: null })
-  googleRefreshToken?: string | null;
+  googleRefreshToken: string | null;
 
   @Prop()
-  emailVerificationToken?: string;
+  emailVerificationToken: string | null;
 
   @Prop()
-  emailVerificationTokenExpiresAt?: Date;
+  emailVerificationTokenExpiresAt: Date | null;
 }
 
 export type UserDocument = User & Document;
