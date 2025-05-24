@@ -32,11 +32,11 @@ import { UserModule } from '../user/user.module';
       useClass: ThrottlerGuard,
     },
     {
-      provide:'APP_GUARD',
+      provide:APP_GUARD,
       useClass:JwtAuthGuard
     },
     {
-      provide:'APP_GUARD',
+      provide:APP_GUARD,
       useClass:RolesGuard
     },
     

@@ -1,9 +1,9 @@
-import { Get, Body, Controller, Post } from "@nestjs/common";
+import { Get, Body, Controller, Post, Param, Put, Delete } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { User } from "./user.schema";
-import { CreateUserDto } from "./user.dto";
+import { User } from "./schemas/user.schema";
+import { CreateUserDto, UpdateUserDto } from "./dtos/user.dto";
 import { plainToInstance } from "class-transformer";
-import { Public, Roles } from "@kodevy-core-2.0/backend";
+import {  CurrentUser, Roles } from "@kodevy-core-2.0/backend";
 import { Role } from "@kodevy-core-2.0/shared";
 
 
@@ -23,4 +23,28 @@ export class UserController {
    const user = plainToInstance(User, userDto);
     return this.userService.create(user);
  }
+
+ @Get(':id')
+ @Roles(Role.SUPER_ADMIN)
+ async getUser(@Param('id') id: string): Promise<User> {
+   return this.userService.findById(id);
+ }
+
+ @Put(':id')
+ @Roles(Role.SUPER_ADMIN)
+ async updateUser(@Param('id') id: string, @Body() userDto: UpdateUserDto): Promise<User> {
+   return this.userService.update(id, userDto);
+ }
+
+ @Delete(':id')
+ @Roles(Role.SUPER_ADMIN)
+ async deleteUser(@Param('id') id: string): Promise<void> {
+   return this.userService.delete(id);
+ }
+
+ @Get('me')
+ async getMe(@CurrentUser() user: User): Promise<User> {
+   return this.userService.findById(user.id);
+ }
+
 }

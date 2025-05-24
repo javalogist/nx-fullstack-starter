@@ -1,9 +1,9 @@
-import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload} from "@kodevy-core-2.0/backend";
+import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload, comparePassword} from "@kodevy-core-2.0/backend";
 import {  Injectable, NotImplementedException, Scope, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { LoginType } from "@kodevy-core-2.0/shared";
-import { CreateUserDto } from "../user/user.dto";
-import { User } from "../user/user.schema";
+import { LoginType, Role } from "@kodevy-core-2.0/shared";
+import { CreateUserDto } from "../user/dtos/user.dto";
+import { User } from "../user/schemas/user.schema";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../user/user.service";
 
@@ -14,9 +14,7 @@ export class AuthService implements IAuthService<User> {
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
-  ) {
-    console.log('REAL AuthService INIT', Date.now());
-  }
+  ) {}
 
   async findById(id: string): Promise<User> {
     const user = await this.userService.findById(id);
@@ -28,11 +26,8 @@ export class AuthService implements IAuthService<User> {
 
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userService.findByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
-    if (await this.userService.validatePassword(user, password)) {
-      if (!user.isEmailVerified) {
+    if(await comparePassword(password,user.password)){
+      if(!user.isEmailVerified){
         throw new UnauthorizedException('Email not verified');
       }
       return user;
@@ -53,7 +48,13 @@ export class AuthService implements IAuthService<User> {
       const googleProfile = profile as GoogleOAuthPayload;
 
       const user = await this.userService.findByEmail(googleProfile.email);
-      if (user) {
+      if (user ) {
+        if(user.loginType === LoginType.GOOGLE){
+          if(user.googleId !== googleProfile.sub){
+            throw new UnauthorizedException('Google account already in use');
+          }
+        }
+        else throw new BusinessLogicException("You are already registered with different login type or provider, please login with the same");
         return user;
       }
      
@@ -185,7 +186,7 @@ export class AuthService implements IAuthService<User> {
 
     // Send new verification email
     const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'Frontend');
-    await this.mailService.send({
+     this.mailService.send({
       to: user.email,
       subject: 'Verify your email',
       template: 'verifyEmail',
@@ -198,6 +199,14 @@ export class AuthService implements IAuthService<User> {
     });
 
     return { message: 'Verification email sent successfully' };
+  }
+
+  async registerSuperAdmin(user:Partial<User>, registrationToken:string): Promise<User> {
+    if(registrationToken !== this.configService.get('SUPER_ADMIN_REGISTRATION_TOKEN')){
+      throw new UnauthorizedException('Invalid registration token');
+    }
+    const adminUser = {...user, roles: [Role.SUPER_ADMIN,Role.ADMIN, Role.USER], isEmailVerified: true};
+    return this.userService.create(adminUser);
   }
 }
 

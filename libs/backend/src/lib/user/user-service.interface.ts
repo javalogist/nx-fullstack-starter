@@ -8,11 +8,7 @@ export interface IUserService<TUser = IBaseUser> {
   create(userData: Partial<TUser>): Promise<TUser>;
   update(id: string, userData: Partial<TUser>): Promise<TUser>;
   delete(id: string): Promise<void>;
-
-  // Authentication methods
-  validateUser(email: string, password: string): Promise<TUser | null>;
-  validatePassword(user: TUser, password: string): Promise<boolean>;
-
+  
   // OAuth methods
   findOrCreateOAuthUser(provider: string, email: string, profile: any): Promise<TUser>;
 }

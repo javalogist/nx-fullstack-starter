@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document } from 'mongoose';
 import { IBaseUser } from '@kodevy-core-2.0/shared';
 import { LoginType } from '@kodevy-core-2.0/shared';
-import { BaseSchema } from '../common/base.schema';
+import { BaseSchema, configureSchema } from '../../app/base.schema';
+import { comparePassword, hashPassword } from '@kodevy-core-2.0/backend';
 
 @Schema({
   timestamps: true, 
@@ -59,12 +60,6 @@ export class User extends BaseSchema implements IBaseUser {
   @Prop({ required: false, default: null })
   googleRefreshToken?: string | null;
 
-  @Prop({ required: true, default: Date.now })
-  createdAt: Date;
-
-  @Prop({ required: true, default: Date.now })
-  updatedAt: Date;
-
   @Prop()
   emailVerificationToken?: string;
 
@@ -75,27 +70,23 @@ export class User extends BaseSchema implements IBaseUser {
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Configure schema to include virtuals
-UserSchema.set('toJSON', {
-  virtuals: true,
-  transform: (doc, ret) => {
-    ret.id = ret._id;
-    delete ret._id;
-    delete ret.__v;
-    return ret;
-  },
-});
 
-UserSchema.set('toObject', {
-  virtuals: true,
-  transform: (doc, ret) => {
-    ret.id = ret._id;
-    delete ret._id;
-    delete ret.__v;
-    return ret;
-  },
-});
+// Apply common schema configurations
+configureSchema(UserSchema);
 
 // Add indexes for better query performance
-//for email and username, unique true will create the index
 UserSchema.index({ googleId: 1 });
+
+// Add pre-save middleware to hash password
+UserSchema.pre('save', async function(next) {
+  const user = this as UserDocument;
+  
+  // Only hash the password if it's modified (or new)
+  if (!user.isModified('password')) {
+    return next();
+  }
+
+  user.password = await hashPassword(user.password);
+  next();
+});
+

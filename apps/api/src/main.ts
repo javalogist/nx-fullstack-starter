@@ -37,9 +37,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  app.useGlobalFilters(
-    new BusinessLogicExceptionFilter(),
-  );
+  app.useGlobalFilters(new BusinessLogicExceptionFilter(),);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

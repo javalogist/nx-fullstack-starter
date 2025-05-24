@@ -9,7 +9,7 @@ const SALT_ROUNDS = 10;
  * @returns The hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+  return await bcrypt.hash(password, SALT_ROUNDS);
 }
 
 /**

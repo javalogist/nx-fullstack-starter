@@ -1,19 +1,31 @@
 import {CurrentUser, GoogleAuthGuard, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
-import { Body, Controller, Post, UnauthorizedException, UseGuards, Get, Query, Req } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Get, Query, Req } from "@nestjs/common";
 import { LoginDto } from "./login.dto";
 import { AuthService } from "./auth.service";
-import { CreateUserDto } from "../user/user.dto";
+import { CreateUserDto, SuperAdminRegisterDto } from "../user/dtos/user.dto";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from "../user/user.schema";
+import { User } from "../user/schemas/user.schema";
+import { plainToInstance } from "class-transformer";
 
+@Public()
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
 
+  @Post('super-admin-register')
+  @ApiOperation({ summary: 'Register a new super admin' })
+  @ApiQuery({ name: 'dto', required: true, description: 'Super admin registration data' })
+  @ApiResponse({ status: 201, description: 'Super admin registered successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Invalid registration token' })
+  async superAdminRegister(@Body() userDto: SuperAdminRegisterDto): Promise<User> {
+   const user = plainToInstance(User, userDto);
+   return this.authService.registerSuperAdmin(user, userDto.registrationToken);
+  }
+  
     @Post('login')
-    @Public()
     @ApiOperation({ summary: 'Login user' })
     @ApiQuery({ name: 'credentials', required: true, description: 'Login credentials' })
     @ApiResponse({ status: 200, description: 'User logged in successfully' })
@@ -29,14 +41,12 @@ export class AuthController {
     }
 
     @Get('google')
-    @Public()
     @UseGuards(GoogleAuthGuard)
-    async googleAuth(@Req() req) {
+    async googleAuth() {
       // Redirect to Google login
     }
   
     @Get('google/redirect')
-    @Public()
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@CurrentUser() user: User) {
       const token = await this.authService.generateToken(user);
@@ -44,7 +54,6 @@ export class AuthController {
     }
 
     @Post('register')
-    @Public()
     @ApiOperation({ summary: 'Register a new user' })
     @ApiQuery({ name: 'dto', required: true, description: 'User registration data' })
     @ApiResponse({ status: 201, description: 'User registered successfully' })
@@ -57,7 +66,6 @@ export class AuthController {
     }
 
     @Get('verify-email')
-    @Public()
     @ApiOperation({ summary: 'Verify user email address' })
     @ApiQuery({ name: 'token', required: true, description: 'Email verification token' })
     @ApiResponse({ status: 200, description: 'Email verified successfully' })
@@ -66,12 +74,20 @@ export class AuthController {
       return this.authService.verifyEmail(token);
     }
 
-    @Post('resend-verification')
-    @Public()
+    @Get('resend-verification')
     @ApiOperation({ summary: 'Resend verification email' })
     @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
     @ApiResponse({ status: 200, description: 'User not found or already verified' })
-    async resendVerificationEmail(@Body('email') email: string) {
+    async resendVerificationEmail(@Query('email') email: string) {
       return this.authService.resendVerificationEmail(email);
     }
+
+    // @Post('forgot-password')
+    // @ApiOperation({ summary: 'Forgot user password' })
+    // @ApiQuery({ name: 'dto', required: true, description: 'Forgot password data' })
+    // @ApiResponse({ status: 200, description: 'Forgot password successfully' })
+    // @ApiResponse({ status: 400, description: 'Bad request' })
+    // async changePassword(@Body() dto: ChangePasswordDto) {
+    //   return this.authService.changePassword(dto);
+    // }
 }

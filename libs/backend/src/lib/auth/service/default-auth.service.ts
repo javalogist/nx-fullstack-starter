@@ -8,6 +8,7 @@ import { IUserService } from "../../user/user-service.interface";
 import { AccessTokenPayload } from "../../types/access-token.payload";
 import { OAuthProvider } from "../constants/auth.constants";
 import { GoogleOAuthPayload } from "../../types/google-oauth.payload";
+import { comparePassword } from "../../common/bcrypt.util";
 
 @Injectable()
 export class DefaultAuthService<T extends IBaseUser = IBaseUser> implements IAuthService<T> {
@@ -29,7 +30,7 @@ export class DefaultAuthService<T extends IBaseUser = IBaseUser> implements IAut
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    if (await this.userService.validatePassword(user, password)) {
+    if (await comparePassword(password, user.password)) {
       if (!user.isEmailVerified) {
         throw new UnauthorizedException('Email not verified');
       }
