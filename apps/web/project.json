@@ -12,13 +12,13 @@
         "buildTarget": "web:build",
         "dev": true,
         "turbo": true,
-        "port":4001
+        "port":4000
       },
       "configurations": {
         "development": {
           "buildTarget": "web:build:development",
           "dev": true,
-          "port":4001
+          "port":4000
         },
         "production": {
           "buildTarget": "web:build:production",

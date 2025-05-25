@@ -1,15 +1,14 @@
 // global-exception.filter.ts
-import { ApiErrorResponse } from '@kodevy-core-2.0/shared';
 import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { BusinessLogicException } from './business-logic.exception';
+import { ApiResponse } from '@kodevy-core-2.0/shared';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -30,18 +29,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.message
         : 'Internal server error';
 
-    const res: ApiErrorResponse = {
-      statusCode: status,
+    const res = ApiResponse.error(
       message,
-      errorCode: exception?.code || 'INTERNAL_ERROR',
-      path: ctx.getRequest().url,
-      timestamp: new Date().toISOString(),
-      stackTrace: process.env['NODE_ENV'] !== 'production' ? exception.stack : undefined,
-    };
+      status,
+      exception?.code || 'INTERNAL_ERROR',
+      ctx.getRequest().url,
+      exception.stack
+    );
 
     this.logger.error(res.message, res.stackTrace, 'GlobalExceptionFilter');
 
     response.status(status).json(res);
   }
 }
-  

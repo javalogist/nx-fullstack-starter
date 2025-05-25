@@ -2,7 +2,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { BusinessLogicException } from './business-logic.exception';
 import { Response } from 'express';
-import { ApiErrorResponse, ApiResponse } from '@kodevy-core-2.0/shared';
+import { ApiResponse } from '@kodevy-core-2.0/shared';
 
 @Catch(BusinessLogicException)
 export class BusinessLogicExceptionFilter implements ExceptionFilter {
@@ -13,12 +13,7 @@ export class BusinessLogicExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const res: ApiResponse = {
-      success: false,
-      data: null,
-      message: exception.message,
-      errorCode: exception.errorCode,
-    };
+    const res = ApiResponse.fail(exception.message, exception.errorCode);
 
     //only in development mode
     this.logger.warn(`[BusinessLogicException]: ${exception.message}`, 'BusinessLogicExceptionFilter');

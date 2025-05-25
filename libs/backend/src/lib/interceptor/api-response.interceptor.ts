@@ -20,22 +20,13 @@ import {
         map((data) => {
           // If it's already an ApiResponse-like object, avoid wrapping again
           if (
-            data &&
-            typeof data === 'object' &&
-            'success' in data &&
-            ('data' in data || 'message' in data)
+            data && ApiResponse.isApiResponse(data)
           ) {
             return data;
           }
-  
-          const response: ApiResponse<T> = {
-            success: true,
-            data,
-            message: 'Request successful',
-          };
-  
-          return response;
-        }),
+
+          return ApiResponse.success(data, 'Request successful');
+          }),
       );
     }
   }

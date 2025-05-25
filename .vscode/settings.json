@@ -4,5 +4,9 @@
     "workbench.tree.stickyScrollMaxItemCount": 7,
     "files.exclude": {
         "**/tmp": true
-    }
+    },
+    "css.validate": false,
+    "css.customData": [".vscode/css-data.json"],
+    "less.validate": false,
+    "scss.validate": false
 }
