@@ -25,7 +25,9 @@ import {
             return data;
           }
 
-          return ApiResponse.success(data, 'Request successful');
+          return ApiResponse.success(
+            data.data ?? data,
+             data.message ?? 'Request successful');
           }),
       );
     }

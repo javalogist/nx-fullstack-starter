@@ -15,19 +15,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = Logger;
 
   catch(exception: any, host: ArgumentsHost) {
-    console.log('catched in  GlobalExceptionFilter');
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = (exception.status || exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR);
 
-    const message =
-      exception instanceof HttpException
-        ? exception.message
-        : 'Internal server error';
+    const message = exception.response?.message || exception.message || 'Internal server error';
 
     const res = ApiResponse.error(
       message,

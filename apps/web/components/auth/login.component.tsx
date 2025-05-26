@@ -20,6 +20,7 @@ import {
 } from '@kodevy-core-2.0/frontend/client';
 import { toast } from 'sonner';
 import { IconBrandApple } from '@tabler/icons-react';
+import { ApiResponse } from '@kodevy-core-2.0/shared';
 
 // Official Next.js logo SVG
 const NextLogo = () => (
@@ -47,26 +48,15 @@ export const LoginComponent = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
     firstName: '',
+    middleName: '',
     lastName: '',
     agree: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const healthCheck = async () => {
-      try {
-        const res = apiClient.get('health');
-      } catch (e) {
-        console.log('health check failed');
-        console.error(e);
-      }
-    }
-    healthCheck().then(() => {
-      console.log('health check completed');
-    });
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -108,25 +98,24 @@ export const LoginComponent = () => {
       toast.error('You must agree to the Terms & Conditions');
       return;
     }
-    setLoading(true);
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Registration successful! Please check your email for verification.');
-        setActiveTab('login');
-      } else {
-        toast.error(data.message || 'Registration failed');
-      }
-    } catch (error) {
-      toast.error('An error occurred during registration');
-    } finally {
-      setLoading(false);
+    if(formData.password !== formData.confirmPassword){
+      toast.error('Passwords do not match');
+      return;
     }
+    setLoading(true);
+   try{
+    const requestBody = {...formData, confirmPassword:undefined, callbackUrl:"http://localhost:4000/verify"};
+    const response = await apiClient.post<ApiResponse<string>>('auth/register', requestBody);
+    if(response.success){
+      toast.success(response.message ?? 'Account created successfully');
+    }else{
+      toast.error(response.message ?? 'Got success as false or something else');
+    }
+   }catch(e){
+    toast.error('An error occurred during signup');
+   }finally{
+    setLoading(false);
+   }
   };
 
   const handleGoogleLogin = () => {
@@ -281,6 +270,17 @@ export const LoginComponent = () => {
                         />
                       </div>
                       <div>
+                        <Label htmlFor="middleName" className="text-white">Middle Name <span className="text-xs text-gray-400">(optional)</span></Label>
+                        <Input
+                          id="middleName"
+                          name="middleName"
+                          placeholder="Middle Name"
+                          value={formData.middleName}
+                          onChange={handleInputChange}
+                          className="bg-[#181824] border border-[#35354d] text-white"
+                        />
+                      </div>
+                      <div>
                         <Label htmlFor="lastName" className="text-white">Last Name</Label>
                         <Input
                           id="lastName"
@@ -330,6 +330,20 @@ export const LoginComponent = () => {
                           {showPassword ? '🙈' : '👁️'}
                         </button>
                       </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="text"
+                        autoComplete="off"
+                        placeholder="Re-enter your password"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-[#181824] border border-[#35354d] text-white"
+                      />
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox

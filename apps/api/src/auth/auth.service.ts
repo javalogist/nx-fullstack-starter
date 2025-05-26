@@ -100,9 +100,8 @@ export class AuthService implements IAuthService<User> {
       emailVerificationTokenExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
-    // Send verification email
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL','Frontend');
-    await this.mailService.send({
+    
+     this.mailService.send({
       to: user.email,
       subject: 'Verify your email',
       template: 'verifyEmail',
@@ -110,7 +109,7 @@ export class AuthService implements IAuthService<User> {
         firstName: user.firstName,
         lastName: user.lastName,
         appName: this.configService.get('APP_NAME', 'Our App'),
-        verificationLink: `${frontendUrl}/verify-email?token=${verificationToken}`,
+        verificationLink: `${dto.callbackUrl}?token=${verificationToken}`,
       },
     });
 

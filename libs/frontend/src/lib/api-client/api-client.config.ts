@@ -22,14 +22,11 @@ export const getToken = async (): Promise<string | null> => {
   }
 };
 
-const storeToken = async (token: string) => {
+const storeToken = async (token: string|null|undefined) => {
   if (!token) return;
-
-  if (isServer) {
     localStorage.setItem(LOCAL_STORAGE_KEY, token);
     const maxAge = await getTokenMaxAge(token);
     await setCookie(ACCESS_TOKEN_KEY, token, maxAge);
-  }
 };
 
 const buildUrl = (endpoint: string, rewrite: boolean) => {
@@ -95,8 +92,11 @@ export const fetchRequest = async <T>(
         json?.stackTrace
       );
     }
-
-    return json.data as T;
+    const data = json.data;
+    if(json.data.token){
+      await storeToken(json.data.token);
+    }
+    return data as T;
   } catch (err: any) {
     if (err instanceof ApiResponse) throw err;
     throw ApiResponse.fromHttpError(err);

@@ -62,7 +62,10 @@ export class AuthController {
       const user = await this.authService.registerUser(
         dto
       );
-      return user;
+      return {
+        data:"User registered",
+        message:'User registered successfully. Please check your email for verification.',
+      };
     }
 
     @Get('verify-email')

@@ -8,3 +8,8 @@ export function toModel<TModel, TEntity extends Document>(entity: TEntity): TMod
 export function toModelArray<TModel, TEntity extends Document>(entities: TEntity[]): TModel[] {
     return entities.map(entity => toModel<TModel, TEntity>(entity));
 }
+
+export const parseBoolean = (value: string | undefined, defaultValue: boolean): boolean => {
+    if (value === undefined) return defaultValue;
+    return value.toLowerCase() === 'true';
+  };

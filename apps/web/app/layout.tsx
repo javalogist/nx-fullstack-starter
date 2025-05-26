@@ -31,7 +31,6 @@ export default function RootLayout({
       disableTransitionOnChange
     >
       <Providers>{children}</Providers>
-      <ThemeToggle/>
     </ThemeProvider>
     </body>
     </html>

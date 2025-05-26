@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipeOptions } from '@nestjs/common';
+import { parseBoolean } from '../common/type-converter';
 
 /**
  * Configures global pipes for NestJS applications
@@ -17,9 +18,9 @@ import { ValidationPipeOptions } from '@nestjs/common';
  * VALIDATION_TRANSFORM=true
  */
 export const pipesConfig = (configService: ConfigService): ValidationPipeOptions => {
-  const whitelist = configService.get('VALIDATION_WHITELIST', true);
-  const forbidNonWhitelisted = configService.get('VALIDATION_FORBID_NON_WHITELISTED', true);
-  const transform = configService.get('VALIDATION_TRANSFORM', true);
+  const whitelist = parseBoolean(configService.get('VALIDATION_WHITELIST'), true);
+  const forbidNonWhitelisted = parseBoolean(configService.get('VALIDATION_FORBID_NON_WHITELISTED'), true);
+  const transform = parseBoolean(configService.get('VALIDATION_TRANSFORM'), true);
 
   const config: ValidationPipeOptions = {
     whitelist,
