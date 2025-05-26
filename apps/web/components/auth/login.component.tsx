@@ -21,8 +21,13 @@ import { toast } from 'sonner';
 import { IconBrandApple } from '@tabler/icons-react';
 import { ApiResponse, UserModel } from '@kodevy-core-2.0/shared';
 import { apiClient } from 'apps/web/api-client/api-client';
-import { deleteToken } from '@kodevy-core-2.0/frontend/shared';
-// Official Next.js logo SVG
+import { TokenManager } from '@kodevy-core-2.0/frontend/shared';
+
+
+export interface LoginComponentProps {
+  callbackUrl: string;
+}
+
 const NextLogo = () => (
   <svg height="32" viewBox="0 0 75 65" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M37.5 0C16.789 0 0 14.326 0 32.5c0 18.174 16.789 32.5 37.5 32.5S75 50.674 75 32.5C75 14.326 58.211 0 37.5 0zm0 60C20.112 60 6 47.464 6 32.5S20.112 5 37.5 5 69 17.536 69 32.5 54.888 60 37.5 60z" fill="#fff" />
@@ -42,7 +47,7 @@ const GoogleIcon = () => (
 
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format';
 
-export const LoginComponent = () => {
+export const LoginComponent = ({callbackUrl}:LoginComponentProps) => {
   const [activeTab, setActiveTab] = useState('login');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,7 +63,7 @@ export const LoginComponent = () => {
   const router = useRouter();
 
   useEffect(() => {
-   deleteToken();
+   TokenManager.clear();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +83,7 @@ export const LoginComponent = () => {
     if(response.success){
       toast.success(response.message ?? 'Login successful');
       setTimeout(() => {
-        router.push('/home');
+        router.push('/');
       }, 1000);
     }else{
       toast.error(response.message ?? 'Login failed');
@@ -102,7 +107,8 @@ export const LoginComponent = () => {
     }
     setLoading(true);
    try{
-    const requestBody = {...formData, confirmPassword:undefined, callbackUrl:"http://localhost:4000/verify"};
+    
+    const requestBody = {...formData, confirmPassword:undefined, callbackUrl:callbackUrl};
     const response = await apiClient.post<ApiResponse<string>>('auth/register', requestBody);
     if(response.success){
       toast.success(response.message ?? 'Account created successfully');

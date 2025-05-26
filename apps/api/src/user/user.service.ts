@@ -71,6 +71,10 @@ export class UserService {
         return this.userModel.findByIdAndDelete(id);
     }
 
+    async deleteAll(): Promise<void> {
+        await this.userModel.deleteMany();
+    }
+
     findOrCreateOAuthUser(provider: string, email: string, profile: any): Promise<UserDocument> {
         return this.userModel.findOne({ email });
     }

@@ -7,17 +7,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { corsConfig, WinstonLoggerService, apiVersionConfig, pipesConfig,
    setupSwagger, BusinessLogicExceptionFilter, GlobalExceptionFilter,
-    RequestLoggerInterceptor, ApiResponseInterceptor
+    RequestLoggerInterceptor, ApiResponseInterceptor, compressionConfig
    } from '@kodevy-core-2.0/backend';
 import helmet from 'helmet';
 import { helmetConfig } from '@kodevy-core-2.0/backend';
 import { ConfigService } from '@nestjs/config';
-import compression from 'compression';
-import { compressionConfig } from '@kodevy-core-2.0/backend';
-import { http } from 'winston';
+import fastifyCompress from '@fastify/compress';
 
 async function bootstrap() {
-
   const isProd = process.env.NODE_ENV === 'production';
   const fastifyAdapter = isProd
   ? new FastifyAdapter({
@@ -31,22 +28,21 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const globalPrefix = configService.get<string>('API_GLOBAL_PREFIX', 'api');
 
+  // Register Fastify compression plugin
+  await app.register(fastifyCompress, compressionConfig(configService));
 
   app.useLogger(app.get(WinstonLoggerService));
   app.setGlobalPrefix(globalPrefix);
 
   app.use(helmet(helmetConfig(configService)));
   app.enableCors(corsConfig(configService));
-  app.use(compression(compressionConfig(configService)));
 
   app.enableVersioning(apiVersionConfig(configService));
-
 
   app.useGlobalPipes(new ValidationPipe(pipesConfig(configService)));
 
   // Setup Swagger
   setupSwagger(app, configService, globalPrefix);
-
 
   app.useGlobalInterceptors(
     new RequestLoggerInterceptor(),

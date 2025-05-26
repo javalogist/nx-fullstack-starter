@@ -1,11 +1,10 @@
 import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
-import * as compression from 'compression';
+import { FastifyCompressOptions } from '@fastify/compress';
 
 /**
- * Configures compression middleware for NestJS applications
+ * Configures compression middleware for Fastify applications
  * @param configService - NestJS ConfigService instance
- * @returns CompressionOptions object
+ * @returns FastifyCompressOptions object
  * 
  * Environment Variables:
  * - COMPRESSION_LEVEL: Compression level (1-9, default: 6)
@@ -17,23 +16,20 @@ import * as compression from 'compression';
  * COMPRESSION_THRESHOLD=1024
  * COMPRESSION_WINDOW_BITS=15
  */
-export const compressionConfig = (configService: ConfigService): compression.CompressionOptions => {
+export const compressionConfig = (configService: ConfigService): FastifyCompressOptions => {
   const level = Number(configService.get('COMPRESSION_LEVEL', 6));
   const threshold = Number(configService.get('COMPRESSION_THRESHOLD', 1024));
   const windowBits = Number(configService.get('COMPRESSION_WINDOW_BITS', 15));
 
-
-  const config: compression.CompressionOptions = {
-    level: level,
-    windowBits: windowBits as number,
-    filter: (req: Request, res: Response) => {
-      if (req.headers['x-no-compression']) {
-        return false;
-      }
-      return compression.filter(req, res);
-    },
-    // Don't compress if response is too small
+  const config: FastifyCompressOptions = {
+    global: true,
+    encodings: ['gzip', 'deflate', 'br'],
+    inflateIfDeflated: true,
     threshold,
+    zlibOptions: {
+      level,
+      windowBits
+    }
   };
 
   // Log configuration in development
@@ -42,6 +38,7 @@ export const compressionConfig = (configService: ConfigService): compression.Com
     console.log('- Level:', level);
     console.log('- Threshold:', threshold, 'bytes');
     console.log('- Window Bits:', windowBits);
+    console.log('- Encodings:', config.encodings);
   }
 
   return config;

@@ -83,8 +83,9 @@ export class AuthController extends BaseController {
   @ApiQuery({ name: 'token', required: true, description: 'Email verification token' })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 401, description: 'Invalid or expired token' })
-  async verifyEmail(@Query('token') token: string) {
-    await this.authService.verifyEmail(token);
+  async verifyEmail(@Query('token') token: string, @Res({ passthrough: true }) res: FastifyReply) {
+    const accessToken = await this.authService.verifyEmail(token);
+    res.header('Authorization', `Bearer ${accessToken}`);
     return this.success(null, 'Email verified successfully');
 
   }

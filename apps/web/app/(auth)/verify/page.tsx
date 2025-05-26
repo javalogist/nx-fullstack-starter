@@ -1,6 +1,8 @@
 // app/verify/page.tsx
 
-import { apiServer } from "@kodevy-core-2.0/frontend/server";
+import { apiClient } from "apps/web/api-client/api-client";
+import { redirect } from "next/navigation";
+import { ApiResponse } from "@kodevy-core-2.0/shared";
 
 interface VerifyPageProps {
     searchParams: Promise<{ token?: string }>;
@@ -8,10 +10,11 @@ interface VerifyPageProps {
 
 async function verifyEmail(token: string) {
   try {
-    const response = await apiServer.get(`auth/verify-email?token=${token}`);
-    return response;
+    const response = await apiClient.get<ApiResponse<null>>(`auth/verify-email?token=${token}`);
+    return response.success;
   } catch (e) {
-    return null;
+    console.error(e);
+    return false;
   }
 }
 
@@ -29,5 +32,5 @@ export default async function VerifyPage({ searchParams }: VerifyPageProps) {
     return <div>Invalid token or verification failed</div>;
   }
 
-  return <div>Email verified successfully. You can now login to your account.</div>;
+  redirect('/?verified=1');
 }

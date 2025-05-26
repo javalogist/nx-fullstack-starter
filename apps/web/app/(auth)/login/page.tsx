@@ -1,15 +1,9 @@
 import LoginComponent from "apps/web/components/auth/login.component";
-import { apiClient } from "apps/web/api-client/api-client";
-
-async function checkHealth() {
-    try {
-        const res = await apiClient.get('health');
-    } catch (e) {
-        throw e;
-    }
-}
 
 export default function AuthPage() {
-   // const isHealth = checkHealth();
-    return <LoginComponent />
+    const callbackUrl = process.env.EMAIL_VERIFICATION_CALLBACK_URL;
+    if(!callbackUrl){
+        throw new Error("EMAIL_VERIFICATION_CALLBACK_URL is not set");
+    }
+    return <LoginComponent callbackUrl={callbackUrl} />
 }

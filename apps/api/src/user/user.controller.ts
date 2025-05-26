@@ -3,13 +3,15 @@ import { UserService } from "./user.service";
 import { User } from "./schemas/user.schema";
 import { CreateUserDto, UpdateUserDto } from "./dtos/user.dto";
 import { plainToInstance } from "class-transformer";
-import {  CurrentUser, Roles } from "@kodevy-core-2.0/backend";
-import { Role } from "@kodevy-core-2.0/shared";
+import {  BaseController, CurrentUser, Roles } from "@kodevy-core-2.0/backend";
+import { ApiResponse, Role } from "@kodevy-core-2.0/shared";
 
 
 @Controller('user')
-export class UserController {
- constructor(private readonly userService: UserService) {}
+export class UserController extends BaseController {
+ constructor(private readonly userService: UserService) {
+    super();
+ }
 
  @Get()
  @Roles(Role.SUPER_ADMIN)
@@ -40,6 +42,13 @@ export class UserController {
  @Roles(Role.SUPER_ADMIN)
  async deleteUser(@Param('id') id: string): Promise<void> {
    return this.userService.delete(id);
+ }
+
+ @Delete()
+ @Roles(Role.SUPER_ADMIN)
+ async deleteAllUsers(): Promise<any> {
+    await this.userService.deleteAll();
+    return this.success(null, 'All users deleted successfully');
  }
 
  @Get('me')

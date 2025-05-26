@@ -13,7 +13,8 @@ export async function middleware(request: NextRequest) {
     path.endsWith('.jpg') ||
     path.endsWith('.css') ||
     path.endsWith('.js') ||
-    path === '/login'
+    path === '/login' ||
+    path === '/verify'
   ) {
     return NextResponse.next(); // Allow static files & login page without token check
   }

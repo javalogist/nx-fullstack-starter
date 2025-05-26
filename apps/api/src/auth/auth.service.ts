@@ -116,7 +116,7 @@ export class AuthService implements IAuthService<User> {
     return user;
   }
 
-  async verifyEmail(token: string): Promise<{ message: string }> {
+  async verifyEmail(token: string): Promise<string> {
     try {
       // Verify the token
       const payload = this.jwtService.verify(token, {
@@ -147,7 +147,9 @@ export class AuthService implements IAuthService<User> {
         emailVerificationTokenExpiresAt: null
       });
 
-      return { message: 'Email verified successfully' };
+      const accessToken = await this.generateToken(user);
+
+      return accessToken;
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;

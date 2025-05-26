@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 import { ApiResponse } from '@kodevy-core-2.0/shared';
 
 @Catch()
@@ -16,7 +16,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+    const response = ctx.getResponse<FastifyReply>();
 
     const status = (exception.status || exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -32,6 +32,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     this.logger.error(res.message, res.stackTrace, 'GlobalExceptionFilter');
 
-    response.status(status).json(res);
+    response.status(status).send(res);
   }
 }

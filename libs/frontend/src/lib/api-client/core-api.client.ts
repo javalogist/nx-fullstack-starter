@@ -2,7 +2,7 @@
 
 import { toast } from 'sonner';
 import { ApiResponse } from '@kodevy-core-2.0/shared';
-import { getToken, storeToken } from './token.utils';
+import { TokenManager } from './token-manager';
 
 export interface ApiClientConfig {
   loginPageRoute:string,
@@ -26,7 +26,7 @@ export const createCoreFetcher = (config: ApiClientConfig) => {
     body?: any
   ): Promise<T> => {
     const url = buildUrl(endpoint, rewrite);
-    const token = await getToken();
+    const token = await TokenManager.get();
     const isServer = typeof window === 'undefined';
 
     try {
@@ -38,10 +38,6 @@ export const createCoreFetcher = (config: ApiClientConfig) => {
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
       });
-      const authHeader = res.headers.get('authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        await storeToken(authHeader.slice(7));
-      }
 
       const json = await res.json().catch(() => null);
 
