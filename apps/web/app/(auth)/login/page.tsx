@@ -1,15 +1,15 @@
-import { apiServer } from "@kodevy-core-2.0/frontend/server";
 import LoginComponent from "apps/web/components/auth/login.component";
+import { apiClient } from "apps/web/api-client/api-client";
 
 async function checkHealth() {
     try {
-        const res = await apiServer.get('health');
+        const res = await apiClient.get('health');
     } catch (e) {
         throw e;
     }
 }
 
 export default function AuthPage() {
-    //const isHealth = checkHealth();
+   // const isHealth = checkHealth();
     return <LoginComponent />
 }

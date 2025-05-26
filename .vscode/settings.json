@@ -1,5 +1,5 @@
 {
-    "editor.fontSize": 13,
+    "editor.fontSize": 14,
     "editor.fontVariations": false,
     "workbench.tree.stickyScrollMaxItemCount": 7,
     "files.exclude": {
@@ -8,5 +8,6 @@
     "css.validate": false,
     "css.customData": [".vscode/css-data.json"],
     "less.validate": false,
-    "scss.validate": false
+    "scss.validate": false,
+    "workbench.tree.indent": 16
 }

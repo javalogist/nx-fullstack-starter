@@ -16,12 +16,12 @@ import {
   TabsTrigger,
   Separator,
   Checkbox,
-  apiClient,
 } from '@kodevy-core-2.0/frontend/client';
 import { toast } from 'sonner';
 import { IconBrandApple } from '@tabler/icons-react';
-import { ApiResponse } from '@kodevy-core-2.0/shared';
-
+import { ApiResponse, UserModel } from '@kodevy-core-2.0/shared';
+import { apiClient } from 'apps/web/api-client/api-client';
+import { deleteToken } from '@kodevy-core-2.0/frontend/shared';
 // Official Next.js logo SVG
 const NextLogo = () => (
   <svg height="32" viewBox="0 0 75 65" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -57,6 +57,9 @@ export const LoginComponent = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+   deleteToken();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -70,21 +73,16 @@ export const LoginComponent = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Login successful!');
-        router.push('/app-shell');
-      } else {
-        toast.error(data.message || 'Login failed');
-      }
+    const response = await apiClient.post<ApiResponse<UserModel>>('auth/login',{email:formData.email, password:formData.password} );
+    console.log(response);
+    if(response.success){
+      toast.success(response.message ?? 'Login successful');
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
+    }else{
+      toast.error(response.message ?? 'Login failed');
+    }
     } catch (error) {
       toast.error('An error occurred during login');
     } finally {

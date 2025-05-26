@@ -6,3 +6,4 @@ export * from './lib/auth/index';
 export * from './lib/messaging/index';
 export * from './lib/types/index';
 export * from './lib/common/index';
+export * from './lib/controller/index';

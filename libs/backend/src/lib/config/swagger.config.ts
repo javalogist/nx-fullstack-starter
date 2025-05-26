@@ -72,7 +72,7 @@ export const setupSwagger = (
 
   // Setup Swagger UI
   const swaggerPath = configService.get<string>('SWAGGER_PATH', 'api-docs');
-  SwaggerModule.setup(swaggerPath, app, document, {
+  SwaggerModule.setup(`/${swaggerPath}`, app, document, {
     swaggerOptions: swaggerUiOptions,
     customSiteTitle: `${appName} API Documentation`,
     customfavIcon: '/favicon.ico',
@@ -83,7 +83,7 @@ export const setupSwagger = (
   
   const jsonPath = configService.get<string>('SWAGGER_JSON_PATH', 'swagger-json');
   const httpAdapter = app.getHttpAdapter();
-  httpAdapter.get(`${globalPrefix}/${versionPrefix}/${version}/${jsonPath}`, (req, res) => {
+  httpAdapter.get(`/${globalPrefix}/${versionPrefix}/${version}/${jsonPath}`, (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(document);
   });
