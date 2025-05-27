@@ -46,20 +46,20 @@ export const createCoreFetcher = (config: ApiClientConfig) => {
           toast.error('Your session has expired. Please login again.');
           window.location.href = config.loginPageRoute;
         }
-        throw ApiResponse.error('Unauthorized', 401, undefined, endpoint);
+        throw ApiResponse.error(json?.message || 'Unauthorized Access', json?.statusCode || 401, json?.errorCode, endpoint);
       }
 
       if (res.status === 403) {
         if (!isServer) {
           toast.error('You do not have permission to perform this action.');
         }
-        throw ApiResponse.error('Forbidden', 403, undefined, endpoint);
+        throw ApiResponse.error(json?.message || 'Forbidden Access', json?.statusCode || 403, json?.errorCode, endpoint);
       }
 
       if (!res.ok || !json) {
         throw ApiResponse.error(
           json?.message || 'Something went wrong.',
-          res.status,
+          json?.statusCode || res.status,
           json?.errorCode,
           endpoint,
           json?.stackTrace
