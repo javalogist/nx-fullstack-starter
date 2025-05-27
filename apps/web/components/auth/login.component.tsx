@@ -81,10 +81,7 @@ export const LoginComponent = ({callbackUrl}:LoginComponentProps) => {
     const response = await apiClient.post<ApiResponse<UserModel>>('auth/login',{email:formData.email, password:formData.password} );
     console.log(response);
     if(response.success){
-      toast.success(response.message ?? 'Login successful');
-      setTimeout(() => {
-        router.push('/');
-      }, 1000);
+      router.push(`/success?token=${response.data}`);
     }else{
       toast.error(response.message ?? 'Login failed');
     }

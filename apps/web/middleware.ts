@@ -1,9 +1,9 @@
+import { TokenManager } from '@kodevy-core-2.0/frontend/shared';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getToken } from '@kodevy-core-2.0/frontend/shared';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken();
+  const token = await TokenManager.get();
   const path = request.nextUrl.pathname;
 
   if (
@@ -14,7 +14,8 @@ export async function middleware(request: NextRequest) {
     path.endsWith('.css') ||
     path.endsWith('.js') ||
     path === '/login' ||
-    path === '/verify'
+    path === '/verify' ||
+    path === '/success'
   ) {
     return NextResponse.next(); // Allow static files & login page without token check
   }

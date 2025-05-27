@@ -1,5 +1,5 @@
 import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload, comparePassword, toModel} from "@kodevy-core-2.0/backend";
-import {  Injectable, NotImplementedException, Scope, UnauthorizedException } from "@nestjs/common";
+import {  Injectable, NotImplementedException, PreconditionFailedException, Scope, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { LoginType, Role, UserModel } from "@kodevy-core-2.0/shared";
 import { CreateUserDto } from "../user/dtos/user.dto";
@@ -99,7 +99,10 @@ export class AuthService implements IAuthService<User> {
       emailVerificationToken: verificationToken,
       emailVerificationTokenExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
-
+    const frontendUrl = this.configService.get<string>('FRONTEND_CALLBACK_URL');
+    if(!frontendUrl){
+      throw new PreconditionFailedException('Frontend callback URL is not set');
+    }
     
      this.mailService.send({
       to: user.email,
@@ -109,7 +112,7 @@ export class AuthService implements IAuthService<User> {
         firstName: user.firstName,
         lastName: user.lastName,
         appName: this.configService.get('APP_NAME', 'Our App'),
-        verificationLink: `${dto.callbackUrl}?token=${verificationToken}`,
+        verificationLink: `${frontendUrl}?token=${verificationToken}`,
       },
     });
 
