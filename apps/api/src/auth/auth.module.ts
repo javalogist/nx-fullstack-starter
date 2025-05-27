@@ -11,7 +11,7 @@ import { LocalStrategy } from '@kodevy-core-2.0/backend';
 import { LocalAuthGuard } from '@kodevy-core-2.0/backend';
 import { jwtConfig } from '@kodevy-core-2.0/backend';
 import { AUTH_SERVICE_TOKEN } from '@kodevy-core-2.0/backend';
-
+import { AuthCodeCacheService } from '@kodevy-core-2.0/backend';
 @Module({
   imports: [
     UserModule,
@@ -34,6 +34,7 @@ import { AUTH_SERVICE_TOKEN } from '@kodevy-core-2.0/backend';
     LocalStrategy,
     LocalAuthGuard,
     GoogleAuthGuard,
+    AuthCodeCacheService
   ],
   exports: [
     AuthService

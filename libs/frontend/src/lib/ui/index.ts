@@ -47,4 +47,3 @@ export * from './tooltip';
 export  * from './tooltip';
 export * from './utils';
 export * from './hooks/index';
-export * from './components/index';

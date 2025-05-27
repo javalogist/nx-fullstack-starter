@@ -9,15 +9,25 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse } from '@kodevy-core-2.0/shared';
 import { BaseController } from '../controller';
-
+import { Reflector } from '@nestjs/core';
+import { CUSTOM_REDIRECT } from '../decorator';
 @Injectable()
 export class ApiResponseInterceptor<T>
   implements NestInterceptor<T, ApiResponse<T>> {
+    constructor(private readonly reflector: Reflector) {}
   intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<ApiResponse<T>> {
+  
+    const skip = this.reflector.getAllAndOverride<boolean>(CUSTOM_REDIRECT, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
+    if (skip) {
+      return next.handle(); // bypass transformation
+    }
     const controllerClass = context.getClass();
 
     // Check inheritance

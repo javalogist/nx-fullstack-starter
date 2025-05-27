@@ -1,5 +1,4 @@
-import { AuthRedirectHandler } from '@kodevy-core-2.0/frontend/client';
-
+import { AuthRedirectHandler } from "apps/web/components/auth/auth-redirect.handler";
 export default function AuthSuccessPage() {
-  return <AuthRedirectHandler type="direct" />;
+  return <AuthRedirectHandler />;
 }

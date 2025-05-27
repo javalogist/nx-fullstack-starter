@@ -7,3 +7,5 @@ export * from './lib/messaging/index';
 export * from './lib/types/index';
 export * from './lib/common/index';
 export * from './lib/controller/index';
+export * from './lib/service/index';
+export * from './lib/decorator/index';

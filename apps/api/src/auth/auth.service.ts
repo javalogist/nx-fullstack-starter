@@ -1,21 +1,28 @@
-import { BusinessLogicException, IAuthService, MailerService, OAuthProvider,AccessTokenPayload, GoogleOAuthPayload, comparePassword, toModel} from "@kodevy-core-2.0/backend";
-import {  Injectable, NotImplementedException, PreconditionFailedException, Scope, UnauthorizedException } from "@nestjs/common";
+import { BusinessLogicException, IAuthService, MailerService, OAuthProvider, AccessTokenPayload, GoogleOAuthPayload, comparePassword, AuthCodeCacheService } from "@kodevy-core-2.0/backend";
+import { Injectable, NotImplementedException, PreconditionFailedException, Scope, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { LoginType, Role, UserModel } from "@kodevy-core-2.0/shared";
+import { LoginType, Role } from "@kodevy-core-2.0/shared";
 import { CreateUserDto } from "../user/dtos/user.dto";
-import { User, UserDocument } from "../user/schemas/user.schema";
+import { User } from "../user/schemas/user.schema";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "../user/user.service";
 
 @Injectable({scope: Scope.DEFAULT})
 export class AuthService implements IAuthService<User> {
+  private readonly VERIFICATION_TOKEN_EXPIRY = '24h';
+  private readonly VERIFICATION_TOKEN_TYPE = 'email-verification';
+  private readonly FRONTEND_EMAIL_VERIFY_CALLBACK_URL = this.configService.get<string>('FRONTEND_EMAIL_VERIFY_CALLBACK_URL');
+  private readonly FRONTEND_AUTH_CALLBACK_URL = this.configService.get<string>('FRONTEND_AUTH_CALLBACK_URL');
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly mailService: MailerService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
+    private readonly authCodeCacheService: AuthCodeCacheService
   ) {}
 
+  //Used by JwtAuthStrategy
   async findById(id: string): Promise<User> {
     const user = await this.userService.findById(id);
     if (!user) {
@@ -24,15 +31,32 @@ export class AuthService implements IAuthService<User> {
     return user;
   }
 
+  //Used by LocalAuthStrategy
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userService.findByEmail(email);
-    if(await comparePassword(password,user.password)){
-      if(!user.isEmailVerified){
-        throw new UnauthorizedException('Email not verified');
-      }
-      return user;
+    if (!await comparePassword(password, user.password)) {
+      throw new BusinessLogicException('Invalid credentials');
     }
-    throw new UnauthorizedException('Invalid credentials');
+    if (!user.isEmailVerified) {
+      throw new BusinessLogicException('Email not verified');
+    }
+    return user;
+  }
+
+  async getAuthCode(userId: string): Promise<string> {
+    const code = Math.random().toString(36).substring(2, 15);
+    this.authCodeCacheService.setAuthCode(code, userId, 60);
+    return code;
+  }
+
+  async verifyAuthCode(code: string): Promise<string> {
+    const userId = this.authCodeCacheService.getAuthCode(code);
+    if (!userId) {
+      throw new BusinessLogicException('Invalid auth code');
+    }
+    const user = await this.userService.findById(userId);
+    this.authCodeCacheService.deleteAuthCode(code);
+    return await this.generateToken(user);
   }
 
   async generateToken(user: User): Promise<string> {
@@ -44,51 +68,42 @@ export class AuthService implements IAuthService<User> {
   }
 
   async findOrCreateOAuthUser(provider: OAuthProvider, profile: Record<string, any>): Promise<User> {
-    if (provider === OAuthProvider.GOOGLE) {
-      const googleProfile = profile as GoogleOAuthPayload;
-
-      const user = await this.userService.findByEmail(googleProfile.email);
-      if (user ) {
-        if(user.loginType === LoginType.GOOGLE){
-          if(user.googleId !== googleProfile.sub){
-            throw new UnauthorizedException('Google account already in use');
-          }
-        }
-        else throw new BusinessLogicException("You are already registered with different login type or provider, please login with the same");
-        return user;
-      }
-     
-    
-      return await this.userService.create({
-        googleId: googleProfile.sub,
-        email: googleProfile.email,
-        password: '',
-        username: await this.userService.getUsername(googleProfile.given_name, googleProfile.family_name),
-        firstName: googleProfile.given_name,
-        lastName: googleProfile.family_name,
-        profilePicture: googleProfile.picture,
-        loginType: LoginType.GOOGLE,
-        isEmailVerified: googleProfile.email_verified,
-        roles: ['user'],
-        googleAccessToken: googleProfile.accessToken,
-        googleRefreshToken: googleProfile.refreshToken,
-      } as Partial<User>);
+    console.log("Here is the profile",profile);
+    if (provider !== OAuthProvider.GOOGLE) {
+      throw new NotImplementedException(`OAuth provider ${provider} not implemented`);
     }
-    throw new NotImplementedException(`OAuth provider ${provider} not implemented`);
+
+    const googleProfile = profile as GoogleOAuthPayload;
+    const existingUser = await this.userService.findByEmail(googleProfile.email);
+
+    if (existingUser) {
+      if (existingUser.loginType !== LoginType.GOOGLE) {
+        throw new BusinessLogicException("You are already registered with different login type or provider, please login with the same");
+      }
+      if (existingUser.googleId !== googleProfile.sub) {
+        throw new UnauthorizedException('Google account already in use');
+      }
+      return existingUser;
+    }
+
+    return this.userService.create({
+      googleId: googleProfile.sub,
+      email: googleProfile.email,
+      password: '',
+      username: await this.userService.getUsername(googleProfile.given_name, googleProfile.family_name),
+      firstName: googleProfile.given_name,
+      lastName: googleProfile.family_name,
+      profilePicture: googleProfile.picture,
+      loginType: LoginType.GOOGLE,
+      isEmailVerified: googleProfile.email_verified,
+      roles: ['user'],
+      googleAccessToken: googleProfile.accessToken,
+      googleRefreshToken: googleProfile.refreshToken,
+    });
   }
 
   async registerUser(dto: CreateUserDto): Promise<User> {
-    // Generate verification token
-    const verificationToken = this.jwtService.sign(
-      { email: dto.email, type: 'email-verification' },
-      { 
-        secret: this.configService.get('VERIFICATION_SECRET'),
-        expiresIn: '24h'
-      }
-    );
-
-    // Create user with verification token
-    const user = await this.userService.create({
+    const userData = {
       email: dto.email,
       password: dto.password,
       firstName: dto.firstName,
@@ -96,63 +111,48 @@ export class AuthService implements IAuthService<User> {
       profilePicture: dto.profilePicture,
       loginType: LoginType.LOCAL,
       isEmailVerified: false,
+    };
+
+    const verificationToken = this.generateVerificationToken(userData.email);
+    const expiryDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const user = await this.userService.create({
+      ...userData,
       emailVerificationToken: verificationToken,
-      emailVerificationTokenExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    });
-    const frontendUrl = this.configService.get<string>('FRONTEND_CALLBACK_URL');
-    if(!frontendUrl){
-      throw new PreconditionFailedException('Frontend callback URL is not set');
-    }
-    
-     this.mailService.send({
-      to: user.email,
-      subject: 'Verify your email',
-      template: 'verifyEmail',
-      data: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        appName: this.configService.get('APP_NAME', 'Our App'),
-        verificationLink: `${frontendUrl}?token=${verificationToken}`,
-      },
+      emailVerificationTokenExpiresAt: expiryDate,
     });
 
+    this.sendVerificationEmail(user, verificationToken);
     return user;
   }
 
   async verifyEmail(token: string): Promise<string> {
     try {
-      // Verify the token
       const payload = this.jwtService.verify(token, {
         secret: this.configService.get('VERIFICATION_SECRET')
       });
 
-      // Check if token is for email verification
-      if (payload.type !== 'email-verification') {
+      if (payload.type !== this.VERIFICATION_TOKEN_TYPE) {
         throw new UnauthorizedException('Invalid verification token');
       }
 
-      // Find user by email
       const user = await this.userService.findByEmail(payload.email);
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
 
-      // Check if token matches and hasn't expired
       if (user.emailVerificationToken !== token || 
           new Date() > user.emailVerificationTokenExpiresAt) {
         throw new UnauthorizedException('Token expired or invalid');
       }
 
-      // Update user verification status
       await this.userService.update(user.id.toString(), {
         isEmailVerified: true,
         emailVerificationToken: null,
         emailVerificationTokenExpiresAt: null
       });
 
-      const accessToken = await this.generateToken(user);
-
-      return accessToken;
+      return this.getAuthCode(user.id);
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
@@ -162,35 +162,55 @@ export class AuthService implements IAuthService<User> {
   }
 
   async resendVerificationEmail(email: string): Promise<{ message: string }> {
-    // Find user by email
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new BusinessLogicException('User not found');
+      throw new BusinessLogicException('User not found for sending verification email');
     }
 
-    // Check if user is already verified
     if (user.isEmailVerified) {
       throw new BusinessLogicException('Email is already verified');
     }
 
-    // Generate new verification token
-    const verificationToken = this.jwtService.sign(
-      { email: user.email, type: 'email-verification' },
-      { 
-        secret: this.configService.get('VERIFICATION_SECRET'),
-        expiresIn: '24h'
-      }
-    );
-
-    // Update user with new verification token
+    const verificationToken = this.generateVerificationToken(user.email);
     await this.userService.update(user.id.toString(), {
       emailVerificationToken: verificationToken,
       emailVerificationTokenExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
-    // Send new verification email
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'Frontend');
-     this.mailService.send({
+    this.sendVerificationEmail(user, verificationToken);
+    return { message: 'Verification email sent successfully' };
+  }
+
+  async registerSuperAdmin(user: Partial<User>, registrationToken: string): Promise<User> {
+    if (registrationToken !== this.configService.get('SUPER_ADMIN_REGISTRATION_TOKEN')) {
+      throw new UnauthorizedException('Invalid registration token');
+    }
+    return this.userService.create({
+      ...user,
+      roles: [Role.SUPER_ADMIN, Role.ADMIN, Role.USER],
+      isEmailVerified: true
+    });
+  }
+
+  private generateVerificationToken(email: string): string {
+    return this.jwtService.sign(
+      { email, type: this.VERIFICATION_TOKEN_TYPE },
+      { 
+        secret: this.configService.get('VERIFICATION_SECRET'),
+        expiresIn: this.VERIFICATION_TOKEN_EXPIRY
+      }
+    );
+  }
+
+  private async sendVerificationEmail(user: User, token: string): Promise<void> {
+    const frontendUrl = this.FRONTEND_EMAIL_VERIFY_CALLBACK_URL;
+    if (!frontendUrl) {
+      throw new PreconditionFailedException('Frontend auth callback URL is not set');
+    }
+
+    const verificationLink = `${frontendUrl}?token=${token}`;
+    console.log("Here is the verification link",verificationLink);
+    await this.mailService.send({
       to: user.email,
       subject: 'Verify your email',
       template: 'verifyEmail',
@@ -198,19 +218,13 @@ export class AuthService implements IAuthService<User> {
         firstName: user.firstName,
         lastName: user.lastName,
         appName: this.configService.get('APP_NAME', 'Our App'),
-        verificationLink: `${frontendUrl}/verify-email?token=${verificationToken}`,
+        verificationLink: verificationLink,
       },
     });
-
-    return { message: 'Verification email sent successfully' };
   }
 
-  async registerSuperAdmin(user:Partial<User>, registrationToken:string): Promise<User> {
-    if(registrationToken !== this.configService.get('SUPER_ADMIN_REGISTRATION_TOKEN')){
-      throw new UnauthorizedException('Invalid registration token');
-    }
-    const adminUser = {...user, roles: [Role.SUPER_ADMIN,Role.ADMIN, Role.USER], isEmailVerified: true};
-    return this.userService.create(adminUser);
+  async getAuthRedirectUrl(code: string): Promise<string> {
+    return `${this.FRONTEND_AUTH_CALLBACK_URL}?code=${code}`;
   }
 }
 

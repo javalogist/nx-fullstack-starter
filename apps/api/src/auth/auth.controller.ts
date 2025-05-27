@@ -1,6 +1,5 @@
-import { CurrentUser, GoogleAuthGuard, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
-import { Body, Controller, Post, UseGuards, Get, Query, Res } from "@nestjs/common";
-import { LoginDto } from "./login.dto";
+import { CurrentUser, CustomRedirect, GoogleAuthGuard, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
+import { Body, Controller, Post, UseGuards, Get, Query, Res, Param } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserDto, SuperAdminRegisterDto } from "../user/dtos/user.dto";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -18,6 +17,7 @@ export class AuthController extends BaseController {
   }
 
 
+  //This can be a exception route, since its used only by super-admin for its own registration. 
   @Post('super-admin-register')
   @ApiOperation({ summary: 'Register a new super admin' })
   @ApiQuery({ name: 'dto', required: true, description: 'Super admin registration data' })
@@ -35,35 +35,16 @@ export class AuthController extends BaseController {
 
   @Post('login')
   @ApiOperation({ summary: 'Login user' })
-  @ApiQuery({ name: 'credentials', required: true, description: 'Login credentials' })
+  @ApiQuery({ name: 'mode', required: false, description: 'Response mode: "redirect" or "json"' })
   @ApiResponse({ status: 200, description: 'User logged in successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(LocalAuthGuard)
   async login(
-    @Body() credentials: LoginDto,
-    @Res({ passthrough: true }) res: FastifyReply,
+    @CurrentUser('id') userId: string
   ) {
-    const user = await this.authService.validateUser(
-      credentials.email,
-      credentials.password
-    );
-    const token = await this.authService.generateToken(user);
-    res.header('Authorization', `Bearer ${token}`);
-    return this.success(token, 'User logged in successfully');
-  }
-
-  @Get('google')
-  @UseGuards(GoogleAuthGuard)
-  async googleAuth() {
-    // Redirect to Google login
-  }
-
-  @Get('google/redirect')
-  @UseGuards(GoogleAuthGuard)
-  async googleAuthRedirect(@CurrentUser() user: User, @Res({ passthrough: true }) res: FastifyReply,) {
-    const token = await this.authService.generateToken(user);
-    res.header('Authorization', `Bearer ${token}`);
-    return this.success(token, 'User logged in successfully');
+    const authCode = await this.authService.getAuthCode(userId);
+    //const redirectUrl = await this.authService.getRedirectUrl('code', authCode);
+    return this.success(authCode, 'Exchange this code for an access token');
   }
 
   @Post('register')
@@ -84,11 +65,11 @@ export class AuthController extends BaseController {
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 401, description: 'Invalid or expired token' })
   async verifyEmail(@Query('token') token: string, @Res({ passthrough: true }) res: FastifyReply) {
-    const accessToken = await this.authService.verifyEmail(token);
-    return this.success(accessToken, 'Email verified successfully');
+    const authCode = await this.authService.verifyEmail(token);
+    return this.success(authCode, 'Email verified successfully. Exchange this code for an access token');
   }
 
-  @Get('resend-verification')
+  @Get('resend-verification-email')
   @ApiOperation({ summary: 'Resend verification email' })
   @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
   @ApiResponse({ status: 200, description: 'User not found or already verified' })
@@ -96,6 +77,41 @@ export class AuthController extends BaseController {
     await this.authService.resendVerificationEmail(email);
     return this.success(null, 'Verification email sent successfully');
   }
+
+  @Get('exchange-auth-code')
+  @ApiOperation({ summary: 'Exchange auth code for an access token' })
+  @ApiQuery({ name: 'code', required: true, description: 'Auth code' })
+  @ApiResponse({ status: 200, description: 'Access token exchanged successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  async exchangeAuthCode(@Query('code') authCode: string) {
+    const accessToken = await this.authService.verifyAuthCode(authCode);
+    return this.success(accessToken, 'Access token exchanged successfully');
+  }
+
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuth() {
+    // Redirect to Google login
+  }
+
+  @CustomRedirect()
+  @Get('google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthRedirect(@CurrentUser() user: User, @Res({ passthrough: false }) res: FastifyReply,) {
+    const authCode = await this.authService.getAuthCode(user.id);
+    const redirectUrl = await this.authService.getAuthRedirectUrl(authCode);
+    res.redirect(redirectUrl);
+  }
+
+  @CustomRedirect()
+  @Get('test-redirect')
+  async testRedirect(@Res({ passthrough: false }) res: FastifyReply) {
+    console.log('🔥 Hit the redirect endpoint');
+
+    res.redirect('http://localhost:4000/login',302);
+  }
+
 
   // @Post('forgot-password')
   // @ApiOperation({ summary: 'Forgot user password' })

@@ -11,26 +11,30 @@ interface VerifyPageProps {
 async function verifyEmail(token: string) {
   try {
     const response = await apiClient.get<ApiResponse<null>>(`auth/verify-email?token=${token}`);
-    return response.success;
+    if(response.success){
+      return response.data!;
+    }
+    return null;
   } catch (e) {
     console.error(e);
-    return false;
+    return null;
   }
 }
 
 export default async function VerifyPage({ searchParams }: VerifyPageProps) {
   const params = await searchParams;
+  console.log("Here is the params",params);
   const token = params.token;
 
   if (!token) {
     return <div>Invalid token</div>;
   }
 
-  const verificationResult = await verifyEmail(token);
+  const authCode = await verifyEmail(token);
 
-  if (!verificationResult) {
+  if (!authCode) {
     return <div>Invalid token or verification failed</div>;
   }
 
-  redirect('/?verified=1');
+  redirect(`/success?code=${authCode}`);
 }

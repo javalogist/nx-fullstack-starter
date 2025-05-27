@@ -3,7 +3,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { corsConfig, WinstonLoggerService, apiVersionConfig, pipesConfig,
    setupSwagger, BusinessLogicExceptionFilter, GlobalExceptionFilter,
@@ -46,7 +46,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(
     new RequestLoggerInterceptor(),
-    new ApiResponseInterceptor(),
+    new ApiResponseInterceptor(app.get(Reflector)),
   )
 
   app.useGlobalFilters(new GlobalExceptionFilter());

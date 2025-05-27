@@ -21,7 +21,6 @@ import { toast } from 'sonner';
 import { IconBrandApple } from '@tabler/icons-react';
 import { ApiResponse, UserModel } from '@kodevy-core-2.0/shared';
 import { apiClient } from 'apps/web/api-client/api-client';
-import { TokenManager } from '@kodevy-core-2.0/frontend/shared';
 
 
 export interface LoginComponentProps {
@@ -62,9 +61,6 @@ export const LoginComponent = ({callbackUrl}:LoginComponentProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-   TokenManager.clear();
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -78,10 +74,10 @@ export const LoginComponent = ({callbackUrl}:LoginComponentProps) => {
     e.preventDefault();
     setLoading(true);
     try {
-    const response = await apiClient.post<ApiResponse<UserModel>>('auth/login',{email:formData.email, password:formData.password} );
+    const response = await apiClient.post<ApiResponse<string>>('auth/login',{email:formData.email, password:formData.password} );
     console.log(response);
     if(response.success){
-      router.push(`/success?token=${response.data}`);
+      router.push(`/success?code=${response.data}`);
     }else{
       toast.error(response.message ?? 'Login failed');
     }
@@ -120,7 +116,7 @@ export const LoginComponent = ({callbackUrl}:LoginComponentProps) => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google';
+    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${process.env.NEXT_PUBLIC_API_GLOBAL_PREFIX}/${process.env.NEXT_PUBLIC_API_VERSION}/auth/google`;
   };
   const handleAppleLogin = () => {
     toast.info('Apple login coming soon!');

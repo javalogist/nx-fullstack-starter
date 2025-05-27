@@ -14,11 +14,12 @@ export async function middleware(request: NextRequest) {
     path.endsWith('.css') ||
     path.endsWith('.js') ||
     path === '/login' ||
-    path === '/verify' ||
+    path === '/verify-email' ||
     path === '/success'
   ) {
     return NextResponse.next(); // Allow static files & login page without token check
   }
+
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));

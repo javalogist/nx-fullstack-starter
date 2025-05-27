@@ -43,9 +43,6 @@ export class UserService {
 
     async findByEmail(email: string): Promise<UserDocument> {
         const user = await this.userModel.findOne({ email });
-        if (!user) {
-            throw new BusinessLogicException('User not found');
-        }
         return user;
     }
 
@@ -72,7 +69,9 @@ export class UserService {
     }
 
     async deleteAll(): Promise<void> {
-        await this.userModel.deleteMany();
+        await this.userModel.deleteMany({
+            roles: { $nin: ['super_admin'] }
+        });
     }
 
     findOrCreateOAuthUser(provider: string, email: string, profile: any): Promise<UserDocument> {
