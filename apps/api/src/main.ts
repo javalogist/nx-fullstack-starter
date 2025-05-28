@@ -9,10 +9,10 @@ import { corsConfig, WinstonLoggerService, apiVersionConfig, pipesConfig,
    setupSwagger, BusinessLogicExceptionFilter, GlobalExceptionFilter,
     RequestLoggerInterceptor, ApiResponseInterceptor, compressionConfig
    } from '@kodevy-core-2.0/backend';
-import helmet from 'helmet';
 import { helmetConfig } from '@kodevy-core-2.0/backend';
 import { ConfigService } from '@nestjs/config';
 import fastifyCompress from '@fastify/compress';
+import helmet from '@fastify/helmet';
 
 async function bootstrap() {
   const isProd = process.env.NODE_ENV === 'production';
@@ -34,7 +34,8 @@ async function bootstrap() {
   app.useLogger(app.get(WinstonLoggerService));
   app.setGlobalPrefix(globalPrefix);
 
-  app.use(helmet(helmetConfig(configService)));
+  await app.register(helmet, helmetConfig(configService));
+
   app.enableCors(corsConfig(configService));
 
   app.enableVersioning(apiVersionConfig(configService));

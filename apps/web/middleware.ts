@@ -20,6 +20,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next(); // Allow static files & login page without token check
   }
 
+  if(token && path === 'login'){
+    return NextResponse.redirect('/');
+  }
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
