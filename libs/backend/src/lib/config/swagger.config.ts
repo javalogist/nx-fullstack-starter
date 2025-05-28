@@ -98,5 +98,5 @@ export const setupSwagger = (
     console.log(`- JSON Path: /${jsonPath}`);
   }
   
-  Logger.debug('Swagger Configuration: jsonPath: '+jsonPath +' swaggerPath: '+swaggerPath);
+  Logger.log('Swagger Configuration: jsonPath: '+jsonPath +' swaggerPath: '+swaggerPath);
 };

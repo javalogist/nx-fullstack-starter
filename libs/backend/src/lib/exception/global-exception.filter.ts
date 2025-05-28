@@ -9,29 +9,52 @@ import {
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 import { ApiResponse } from '@kodevy-core-2.0/shared';
+import { BusinessLogicException } from './business-logic.exception';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  private readonly logger = Logger;
+  private readonly logger = new Logger(GlobalExceptionFilter.name);
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
+    const request = ctx.getRequest();
 
-    const status = (exception.status || exception.statusCode || HttpStatus.INTERNAL_SERVER_ERROR);
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message = 'Internal server error';
+    let errorCode = 'INTERNAL_ERROR';
+    let stack = exception.stack;
 
-    const message = exception.response?.message || exception.message || 'Internal server error';
+    if (exception instanceof BusinessLogicException) {
+      status = 200; // Business logic errors return 200
+      message = exception.message;
+      errorCode = exception.errorCode;
+    } else if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const res = exception.getResponse();
+      if (typeof res === 'object' && res !== null) {
+        message = (res as any).message || message;
+      } else if (typeof res === 'string') {
+        message = res;
+      }
+    } else if (exception.response?.message) {
+      message = exception.response.message;
+    } else if (exception.message) {
+      message = exception.message;
+    }
 
-    const res = ApiResponse.error(
+    const apiError = ApiResponse.error(
       message,
       status,
-      exception?.code || 'INTERNAL_ERROR',
-      ctx.getRequest().url,
-      exception.stack
+      errorCode,
+      request?.url,
+      stack
     );
 
-    this.logger.error(res.message, res.stackTrace, 'GlobalExceptionFilter');
+    this.logger.error(`Error Response: ${request?.method} ${request?.url} --${message} -- [${status}]`,
+      JSON.stringify(apiError),
+    );
 
-    response.status(status).send(res);
+    response.status(status).send(apiError);
   }
 }

@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   const token = await TokenManager.get();
+  console.log('token in middleware', token);
   const path = request.nextUrl.pathname;
 
   if (
@@ -13,18 +14,18 @@ export async function middleware(request: NextRequest) {
     path.endsWith('.jpg') ||
     path.endsWith('.css') ||
     path.endsWith('.js') ||
-    path === '/login' ||
     path === '/verify-email' ||
     path === '/success'
   ) {
     return NextResponse.next(); // Allow static files & login page without token check
   }
 
-  if(token && path === 'login'){
-    return NextResponse.redirect('/');
+  if(token && path === '/login'){
+    console.log('redirecting to home from login');
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (!token) {
+  if (!token && path !== '/login') {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

@@ -4,9 +4,14 @@ import { Alert, AlertDescription, AlertTitle } from "@kodevy-core-2.0/frontend/c
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Skeleton } from "@kodevy-core-2.0/frontend/client";
 import { Suspense } from "react";
-import { delay, TokenManager } from '@kodevy-core-2.0/frontend/shared';
+import { delay } from '@kodevy-core-2.0/frontend/shared';
 import { ApiResponse } from '@kodevy-core-2.0/shared';
 import { apiClient } from 'apps/web/api-client/api-client';
+import { AuthSuccessHandler } from '../../../components/auth/auth-success.handler';
+
+interface AuthSuccessPageProps {
+  searchParams: Promise<{ code?: string }>;
+}
 
 const LoadingState = () => (
   <div className="container flex items-center justify-center min-h-[80vh]">
@@ -54,27 +59,22 @@ const ErrorState = () => (
 );
 
 async function handleAuthCode(code: string) {
-  await delay(5000);
-  return false;
+  await delay(1000);
   try {
     const res = await apiClient.get<ApiResponse<string>>('auth/exchange-auth-code?code=' + code);
     if (res.success) {
-      await TokenManager.set(res.data!);
-      return true;
+      return res.data;
     }
-    return false;
+    return null;
   } catch (e) {
     console.error('Auth code exchange failed:', e);
-    return false;
+    return null;
   }
 }
 
-export default async function AuthSuccessPage({
-  searchParams,
-}: {
-  searchParams: { code?: string };
-}) {
-  const code = searchParams.code;
+export default async function AuthSuccessPage({searchParams}: AuthSuccessPageProps) {
+  const params = await searchParams;
+  const code = params.code;
 
   if (!code) {
     redirect('/login');
@@ -88,11 +88,11 @@ export default async function AuthSuccessPage({
 }
 
 async function AuthContent({ code }: { code: string }) {
-  const success = await handleAuthCode(code);
+  const token = await handleAuthCode(code);
 
-  if (!success) {
+  if (!token) {
     return <ErrorState />;
   }
 
-  redirect('/');
+  return <AuthSuccessHandler token={token} />;
 }

@@ -15,7 +15,7 @@ interface VerifyPageProps {
   }
 
 async function verifyEmail(token: string) {
-  await delay(5000);
+  await delay(1000);
   try {
     const response = await apiClient.get<ApiResponse<null>>(`auth/verify-email?token=${token}`);
     if(response.success){

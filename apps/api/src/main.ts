@@ -45,14 +45,14 @@ async function bootstrap() {
   // Setup Swagger
   setupSwagger(app, configService, globalPrefix);
 
-  app.useGlobalInterceptors(
-    new RequestLoggerInterceptor(),
-    new ApiResponseInterceptor(app.get(Reflector)),
-  )
+// Register interceptors (order matters: logger first, then response formatter)
+app.useGlobalInterceptors(
+  new RequestLoggerInterceptor(),
+  new ApiResponseInterceptor(app.get(Reflector)),
+);
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
-
-  app.useGlobalFilters(new BusinessLogicExceptionFilter(),);
+// Register the global exception filter (after interceptors)
+app.useGlobalFilters(new GlobalExceptionFilter());
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

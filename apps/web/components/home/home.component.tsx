@@ -9,7 +9,9 @@ const HomeComponent = () => {
         <div>
             <h1>Home</h1>
             <button onClick={() => {
-                TokenManager.clear();
+                TokenManager.clear().then(() => {
+                    router.push('/login');
+                });
                 router.push('/login');
             }}>Logout</button>
         </div>
