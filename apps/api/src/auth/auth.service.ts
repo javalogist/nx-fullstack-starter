@@ -34,8 +34,11 @@ export class AuthService implements IAuthService<User> {
   //Used by LocalAuthStrategy
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userService.findByEmail(email);
+    if(!user){
+      throw new BusinessLogicException('User not found');
+    }
     if(user.loginType === LoginType.GOOGLE){
-      throw new BusinessLogicException('You are registereed with google provider, please login with google');
+      throw new BusinessLogicException('You are registered with google provider, please login with google');
     }
     if (!await comparePassword(password, user.password)) {
       throw new BusinessLogicException('Invalid credentials');

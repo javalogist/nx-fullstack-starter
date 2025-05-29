@@ -6,7 +6,7 @@ import {
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { corsConfig, WinstonLoggerService, apiVersionConfig, pipesConfig,
-   setupSwagger, BusinessLogicExceptionFilter, GlobalExceptionFilter,
+   setupSwagger, GlobalExceptionFilter,
     RequestLoggerInterceptor, ApiResponseInterceptor, compressionConfig
    } from '@nx-fullstack-starter/backend';
 import { helmetConfig } from '@nx-fullstack-starter/backend';

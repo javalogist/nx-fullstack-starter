@@ -22,8 +22,6 @@ export class CreateUserDto {
   @IsString()
   profilePicture?: string;
 
-  @IsString()
-  callbackUrl: string;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

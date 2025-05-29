@@ -34,7 +34,11 @@ export class UserService {
     }
 
     findAll(): Promise<UserDocument[]> {
-        return this.userModel.find();
+        console.log('findAll function called - this will always print');
+        return this.userModel.find().exec().then(users => {
+            console.log('Database query executed - this only prints on cache MISS');
+            return users;
+        });
     }
 
     findById(id: string): Promise<UserDocument> {

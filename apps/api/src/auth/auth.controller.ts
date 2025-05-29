@@ -27,10 +27,7 @@ export class AuthController extends BaseController {
   async superAdminRegister(@Body() userDto: SuperAdminRegisterDto): Promise<any> {
     const user = plainToInstance(User, userDto);
     await this.authService.registerSuperAdmin(user, userDto.registrationToken);
-    return {
-      data: null,
-      message: 'Super admin registered successfully',
-    };
+    return this.success(null, 'Super admin registered successfully');
   }
 
   @Post('login')
