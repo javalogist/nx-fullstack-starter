@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@kodevy-core-2.0/shared';
-import { IBaseUser } from '@kodevy-core-2.0/shared';
+import { Role } from '@nx-fullstack-starter/shared';
+import { IBaseUser } from '@nx-fullstack-starter/shared';
 import { ROLES_KEY } from '../constants';
 
 @Injectable()

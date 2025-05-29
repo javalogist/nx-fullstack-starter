@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { IBaseUser } from '@kodevy-core-2.0/shared';
+import { IBaseUser } from '@nx-fullstack-starter/shared';
 
 export const CurrentUser = createParamDecorator(
   (data: keyof IBaseUser | undefined, ctx: ExecutionContext): IBaseUser | any => {

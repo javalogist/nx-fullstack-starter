@@ -1,10 +1,9 @@
-import { TokenManager } from '@kodevy-core-2.0/frontend/shared';
+import { TokenManager } from '@nx-fullstack-starter/frontend/shared';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   const token = await TokenManager.get();
-  console.log('token in middleware', token);
   const path = request.nextUrl.pathname;
 
   if (
@@ -21,7 +20,6 @@ export async function middleware(request: NextRequest) {
   }
 
   if(token && path === '/login'){
-    console.log('redirecting to home from login');
     return NextResponse.redirect(new URL('/', request.url));
   }
 

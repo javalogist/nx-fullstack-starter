@@ -1,4 +1,4 @@
-import { IBaseUser } from '@kodevy-core-2.0/shared';
+import { IBaseUser } from '@nx-fullstack-starter/shared';
 import { OAuthProvider } from '../constants/auth.constants';
 
 export interface IAuthService<T extends IBaseUser = IBaseUser> {

@@ -2,7 +2,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { BusinessLogicException } from './business-logic.exception';
 import { FastifyReply } from 'fastify';
-import { ApiResponse } from '@kodevy-core-2.0/shared';
+import { ApiResponse } from '@nx-fullstack-starter/shared';
 
 @Catch(BusinessLogicException)
 export class BusinessLogicExceptionFilter implements ExceptionFilter {

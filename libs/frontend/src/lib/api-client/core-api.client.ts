@@ -1,7 +1,7 @@
 // core-api-client.ts
 
 import { toast } from 'sonner';
-import { ApiResponse } from '@kodevy-core-2.0/shared';
+import { ApiResponse } from '@nx-fullstack-starter/shared';
 import { TokenManager } from './token-manager';
 
 export interface ApiClientConfig {

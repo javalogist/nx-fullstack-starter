@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { TokenManager } from '@kodevy-core-2.0/frontend/shared';
+import { TokenManager } from '@nx-fullstack-starter/frontend/shared';
 import { useRouter } from 'next/navigation';
 
 interface AuthSuccessHandlerProps {

@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:w-64 flex-col bg-muted p-4 border-r">
         <div className="mb-6 text-lg font-bold tracking-wide">
-          Kodevy Core
+          App Name
         </div>
         <nav className="space-y-1">{renderNavLinks()}</nav>
       </aside>
@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-4">
-                <div className="mb-4 font-bold text-lg">Kodevy Core</div>
+                <div className="mb-4 font-bold text-lg">App Name</div>
                 <nav className="space-y-1">{renderNavLinks()}</nav>
               </SheetContent>
             </Sheet>

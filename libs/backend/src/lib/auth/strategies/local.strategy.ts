@@ -1,7 +1,7 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Inject, Injectable } from '@nestjs/common';
-import { IBaseUser } from '@kodevy-core-2.0/shared';
+import { IBaseUser } from '@nx-fullstack-starter/shared';
 import { IAuthService } from '../interfaces';
 import { AUTH_SERVICE_TOKEN, LOCAL_STRATEGY } from '../constants';
 @Injectable()

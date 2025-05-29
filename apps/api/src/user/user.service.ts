@@ -1,4 +1,4 @@
-import { BusinessLogicException } from "@kodevy-core-2.0/backend";
+import { BusinessLogicException } from "@nx-fullstack-starter/backend";
 import { Injectable } from "@nestjs/common";
 import { User, UserDocument } from "./schemas/user.schema";
 import { Model, Types } from "mongoose";

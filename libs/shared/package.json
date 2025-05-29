@@ -1,5 +1,5 @@
 {
-  "name": "@kodevy-core-2.0/shared",
+  "name": "@nx-fullstack-starter/shared",
   "version": "0.0.1",
   "dependencies": {
     "tslib": "^2.3.0"

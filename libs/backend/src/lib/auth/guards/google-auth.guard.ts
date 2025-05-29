@@ -30,14 +30,12 @@ export class GoogleAuthGuard extends AuthGuard('google') implements CanActivate 
         url = status as any;
         status = 302;
       }
-      console.log(`🚀 Redirecting to ${url} with status ${status}`);
-      // Call the original Fastify redirect method to avoid recursion
       return originalRedirect(url!,status);
     };
 
     (res as any).end = function () {
       console.log('💀 res.end() called — sending Fastify response');
-      res.send();  // This is crucial
+      res.send(); 
     };
 
     (res as any).statusCode = res.statusCode || 200;

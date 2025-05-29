@@ -1,4 +1,4 @@
-import { createApiClient, ApiClient } from "@kodevy-core-2.0/frontend/shared";
+import { createApiClient, ApiClient } from "@nx-fullstack-starter/frontend/shared";
 
 export const apiClient:ApiClient = createApiClient({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || '',

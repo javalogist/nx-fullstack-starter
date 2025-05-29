@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@kodevy-core-2.0/frontend/client";
-import { Alert, AlertDescription, AlertTitle } from "@kodevy-core-2.0/frontend/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@nx-fullstack-starter/frontend/client";
+import { Alert, AlertDescription, AlertTitle } from "@nx-fullstack-starter/frontend/client";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { Skeleton } from "@kodevy-core-2.0/frontend/client";
+import { Skeleton } from "@nx-fullstack-starter/frontend/client";
 import { Suspense } from "react";
-import { delay } from '@kodevy-core-2.0/frontend/shared';
-import { ApiResponse } from '@kodevy-core-2.0/shared';
+import { delay } from '@nx-fullstack-starter/frontend/shared';
+import { ApiResponse } from '@nx-fullstack-starter/shared';
 import { apiClient } from 'apps/web/api-client/api-client';
 import { AuthSuccessHandler } from '../../../components/auth/auth-success.handler';
 

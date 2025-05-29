@@ -15,11 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@kodevy-core-2.0/backend": ["libs/backend/src/index.ts"],
-      "@kodevy-core-2.0/frontend/client": ["libs/frontend/src/client.ts"],
-      "@kodevy-core-2.0/frontend/server": ["libs/frontend/src/server.ts"],
-      "@kodevy-core-2.0/frontend/shared": ["libs/frontend/src/shared.ts"],
-      "@kodevy-core-2.0/shared": ["libs/shared/src/index.ts"]
+      "@nx-fullstack-starter/backend": ["libs/backend/src/index.ts"],
+      "@nx-fullstack-starter/frontend/client": ["libs/frontend/src/client.ts"],
+      "@nx-fullstack-starter/frontend/server": ["libs/frontend/src/server.ts"],
+      "@nx-fullstack-starter/frontend/shared": ["libs/frontend/src/shared.ts"],
+      "@nx-fullstack-starter/shared": ["libs/shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

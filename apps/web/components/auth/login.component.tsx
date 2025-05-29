@@ -16,10 +16,10 @@ import {
   TabsTrigger,
   Separator,
   Checkbox,
-} from '@kodevy-core-2.0/frontend/client';
+} from '@nx-fullstack-starter/frontend/client';
 import { toast } from 'sonner';
 import { IconBrandApple } from '@tabler/icons-react';
-import { ApiResponse, UserModel } from '@kodevy-core-2.0/shared';
+import { ApiResponse, UserModel } from '@nx-fullstack-starter/shared';
 import { apiClient } from 'apps/web/api-client/api-client';
 
 
@@ -75,7 +75,6 @@ export const LoginComponent = ({callbackUrl}:LoginComponentProps) => {
     setLoading(true);
     try {
     const response = await apiClient.post<ApiResponse<string>>('auth/login',{email:formData.email, password:formData.password} );
-    console.log(response);
     if(response.success){
       router.push(`/success?code=${response.data}`);
     }else{

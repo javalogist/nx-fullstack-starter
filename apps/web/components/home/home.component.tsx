@@ -1,6 +1,6 @@
 'use client';
 
-import { TokenManager } from "@kodevy-core-2.0/frontend/shared";
+import { TokenManager } from "@nx-fullstack-starter/frontend/shared";
 import { useRouter } from "next/navigation";
 
 const HomeComponent = () => {

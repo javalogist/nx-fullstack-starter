@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppConfigModule, throttleConfig, WinstonLoggerService, HealthCheckModule, JwtAuthGuard, RolesGuard, MongoConnectionModule } from '@kodevy-core-2.0/backend';
+import { AppConfigModule, throttleConfig, WinstonLoggerService, HealthCheckModule, JwtAuthGuard, RolesGuard, MongoConnectionModule } from '@nx-fullstack-starter/backend';
 import { ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';

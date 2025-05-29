@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IBaseUser } from '@kodevy-core-2.0/shared';
-import { LoginType } from '@kodevy-core-2.0/shared';
+import { IBaseUser } from '@nx-fullstack-starter/shared';
+import { LoginType } from '@nx-fullstack-starter/shared';
 import { BaseSchema, configureSchema } from '../../app/base.schema';
-import { comparePassword, hashPassword } from '@kodevy-core-2.0/backend';
+import { comparePassword, hashPassword } from '@nx-fullstack-starter/backend';
 
 @Schema({
   timestamps: true, 

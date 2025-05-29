@@ -1,11 +1,11 @@
-import { CurrentUser, CustomRedirect, GoogleAuthGuard, LocalAuthGuard, Public } from "@kodevy-core-2.0/backend";
+import { CurrentUser, CustomRedirect, GoogleAuthGuard, LocalAuthGuard, Public } from "@nx-fullstack-starter/backend";
 import { Body, Controller, Post, UseGuards, Get, Query, Res, Param } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserDto, SuperAdminRegisterDto } from "../user/dtos/user.dto";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from "../user/schemas/user.schema";
 import { plainToInstance } from "class-transformer";
-import { BaseController } from "@kodevy-core-2.0/backend";
+import { BaseController } from "@nx-fullstack-starter/backend";
 import { FastifyReply } from 'fastify';
 
 @Public()
@@ -102,14 +102,6 @@ export class AuthController extends BaseController {
     const authCode = await this.authService.getAuthCode(user.id);
     const redirectUrl = await this.authService.getAuthRedirectUrl(authCode);
     res.redirect(redirectUrl);
-  }
-
-  @CustomRedirect()
-  @Get('test-redirect')
-  async testRedirect(@Res({ passthrough: false }) res: FastifyReply) {
-    console.log('🔥 Hit the redirect endpoint');
-
-    res.redirect('http://localhost:4000/login',302);
   }
 
 

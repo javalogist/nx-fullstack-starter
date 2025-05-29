@@ -1,5 +1,5 @@
 // libs/frontend/shared/src/app/api/auth/logout/route.ts
-import { ACCESS_TOKEN_KEY } from '@kodevy-core-2.0/frontend/shared';
+import { ACCESS_TOKEN_KEY } from '@nx-fullstack-starter/frontend/shared';
 import { deleteCookie } from 'libs/frontend/src/lib/actions/cookie-action';
 import { NextResponse } from 'next/server';
 

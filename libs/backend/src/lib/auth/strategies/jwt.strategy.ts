@@ -2,7 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { IBaseUser } from '@kodevy-core-2.0/shared';
+import { IBaseUser } from '@nx-fullstack-starter/shared';
 import { IAuthService } from '../interfaces/auth-service.interface';
 import { AccessTokenPayload } from '../../types/access-token.payload';
 import { AUTH_SERVICE_TOKEN, JWT_STRATEGY } from '../constants';

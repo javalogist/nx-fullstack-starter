@@ -16,7 +16,7 @@ A flexible and feature-rich authentication module for NestJS applications. This 
 ## Installation
 
 ```bash
-npm install @kodevy-core-2.0/backend
+npm install @nx-fullstack-starter/backend
 ```
 
 ## Quick Start
@@ -24,7 +24,7 @@ npm install @kodevy-core-2.0/backend
 1. Import the AuthModule in your application:
 
 ```typescript
-import { AuthModule } from '@kodevy-core-2.0/backend';
+import { AuthModule } from '@nx-fullstack-starter/backend';
 
 @Module({
   imports: [
@@ -48,7 +48,7 @@ export class AppModule {}
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { IUserService, IBaseUser } from '@kodevy-core-2.0/backend';
+import { IUserService, IBaseUser } from '@nx-fullstack-starter/backend';
 
 @Injectable()
 export class YourUserService implements IUserService {

@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
-import { ApiResponse } from '@kodevy-core-2.0/shared';
+import { ApiResponse } from '@nx-fullstack-starter/shared';
 import { BusinessLogicException } from './business-logic.exception';
 
 @Catch()

@@ -1,7 +1,7 @@
-import { BusinessLogicException, IAuthService, MailerService, OAuthProvider, AccessTokenPayload, GoogleOAuthPayload, comparePassword, AuthCodeCacheService } from "@kodevy-core-2.0/backend";
+import { BusinessLogicException, IAuthService, MailerService, OAuthProvider, AccessTokenPayload, GoogleOAuthPayload, comparePassword, AuthCodeCacheService } from "@nx-fullstack-starter/backend";
 import { Injectable, NotImplementedException, PreconditionFailedException, Scope, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { LoginType, Role } from "@kodevy-core-2.0/shared";
+import { LoginType, Role } from "@nx-fullstack-starter/shared";
 import { CreateUserDto } from "../user/dtos/user.dto";
 import { User } from "../user/schemas/user.schema";
 import { ConfigService } from "@nestjs/config";
@@ -71,7 +71,6 @@ export class AuthService implements IAuthService<User> {
   }
 
   async findOrCreateOAuthUser(provider: OAuthProvider, profile: Record<string, any>): Promise<User> {
-    console.log("Here is the profile",profile);
     if (provider !== OAuthProvider.GOOGLE) {
       throw new NotImplementedException(`OAuth provider ${provider} not implemented`);
     }
@@ -212,7 +211,6 @@ export class AuthService implements IAuthService<User> {
     }
 
     const verificationLink = `${frontendUrl}?token=${token}`;
-    console.log("Here is the verification link",verificationLink);
     await this.mailService.send({
       to: user.email,
       subject: 'Verify your email',

@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { GoogleAuthGuard, GoogleStrategy, MailerModule } from '@kodevy-core-2.0/backend';
+import { GoogleAuthGuard, GoogleStrategy, MailerModule } from '@nx-fullstack-starter/backend';
 import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from '@kodevy-core-2.0/backend';
-import { LocalStrategy } from '@kodevy-core-2.0/backend';
-import { LocalAuthGuard } from '@kodevy-core-2.0/backend';
-import { jwtConfig } from '@kodevy-core-2.0/backend';
-import { AUTH_SERVICE_TOKEN } from '@kodevy-core-2.0/backend';
-import { AuthCodeCacheService } from '@kodevy-core-2.0/backend';
+import { JwtStrategy } from '@nx-fullstack-starter/backend';
+import { LocalStrategy } from '@nx-fullstack-starter/backend';
+import { LocalAuthGuard } from '@nx-fullstack-starter/backend';
+import { jwtConfig } from '@nx-fullstack-starter/backend';
+import { AUTH_SERVICE_TOKEN } from '@nx-fullstack-starter/backend';
+import { AuthCodeCacheService } from '@nx-fullstack-starter/backend';
 @Module({
   imports: [
     UserModule,

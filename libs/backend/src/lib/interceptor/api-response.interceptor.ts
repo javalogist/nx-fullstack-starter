@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from '@kodevy-core-2.0/shared';
+import { ApiResponse } from '@nx-fullstack-starter/shared';
 import { BaseController } from '../controller';
 import { Reflector } from '@nestjs/core';
 import { CUSTOM_REDIRECT } from '../decorator';

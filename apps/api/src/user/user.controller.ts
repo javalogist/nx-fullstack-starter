@@ -3,8 +3,8 @@ import { UserService } from "./user.service";
 import { User } from "./schemas/user.schema";
 import { CreateUserDto, UpdateUserDto } from "./dtos/user.dto";
 import { plainToInstance } from "class-transformer";
-import {  BaseController, CurrentUser, Roles } from "@kodevy-core-2.0/backend";
-import { ApiResponse, Role } from "@kodevy-core-2.0/shared";
+import {  BaseController, CurrentUser, Roles } from "@nx-fullstack-starter/backend";
+import { ApiResponse, Role } from "@nx-fullstack-starter/shared";
 
 
 @Controller('user')

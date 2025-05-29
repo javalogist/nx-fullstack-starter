@@ -1,8 +1,8 @@
 import './global.css';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import React from 'react';
-import { ThemeProvider, ThemeToggle } from '@kodevy-core-2.0/frontend/client';
-import { Providers } from '@kodevy-core-2.0/frontend/client';
+import { ThemeProvider, ThemeToggle } from '@nx-fullstack-starter/frontend/client';
+import { Providers } from '@nx-fullstack-starter/frontend/client';
 
 const inter = Inter({
   subsets: ['latin'],

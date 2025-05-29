@@ -8,8 +8,8 @@ import { AppModule } from './app/app.module';
 import { corsConfig, WinstonLoggerService, apiVersionConfig, pipesConfig,
    setupSwagger, BusinessLogicExceptionFilter, GlobalExceptionFilter,
     RequestLoggerInterceptor, ApiResponseInterceptor, compressionConfig
-   } from '@kodevy-core-2.0/backend';
-import { helmetConfig } from '@kodevy-core-2.0/backend';
+   } from '@nx-fullstack-starter/backend';
+import { helmetConfig } from '@nx-fullstack-starter/backend';
 import { ConfigService } from '@nestjs/config';
 import fastifyCompress from '@fastify/compress';
 import helmet from '@fastify/helmet';
